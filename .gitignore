@@ -1,0 +1,15 @@
+.dart_tool/
+.packages
+.pub/
+build/
+pubspec.lock
+*.iml
+.idea/
+.vscode/
+android/.gradle/
+android/local.properties
+ios/Flutter/ephemeral/
+macos/Flutter/ephemeral/
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+web/.dart_tool/
