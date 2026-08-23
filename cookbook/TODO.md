@@ -53,21 +53,21 @@ Temuan utama:
 
 ## Phase 2 - Theme and Design Tokens
 
-- [ ] Buat `lib/core/theme/app_colors.dart`.
-- [ ] Buat `lib/core/theme/app_text_styles.dart`.
-- [ ] Buat `lib/core/theme/app_theme.dart`.
-- [ ] Pindahkan warna dari `main.dart` ke token theme.
-- [ ] Ganti helper `_serif` dan `_eyebrow` menjadi text style reusable.
-- [ ] Terapkan `Merriweather` untuk heading/editorial.
-- [ ] Terapkan `Inter` untuk body/UI.
-- [ ] Pastikan light mode tetap memakai:
-  - [ ] Background `#F8F6F1`
-  - [ ] Surface `#FFFDF8`
-  - [ ] Primary `#5B5FA8`
-- [ ] Pastikan dark mode tetap memakai:
-  - [ ] Background `#151416`
-  - [ ] Surface `#211F21`
-  - [ ] Navigation indicator `#3A3867`
+- [x] Buat `lib/core/theme/app_colors.dart`.
+- [x] Buat `lib/core/theme/app_text_styles.dart`.
+- [x] Buat `lib/core/theme/app_theme.dart`.
+- [x] Pindahkan warna dari `main.dart` ke token theme.
+- [x] Ganti helper `_serif` dan `_eyebrow` menjadi text style reusable.
+- [x] Terapkan `Merriweather` untuk heading/editorial.
+- [x] Terapkan `Inter` untuk body/UI.
+- [x] Pastikan light mode tetap memakai:
+  - [x] Background `#F8F6F1`
+  - [x] Surface `#FFFDF8`
+  - [x] Primary `#5B5FA8`
+- [x] Pastikan dark mode tetap memakai:
+  - [x] Background `#151416`
+  - [x] Surface `#211F21`
+  - [x] Navigation indicator `#3A3867`
 
 ## Phase 3 - Domain Models and Rules
 

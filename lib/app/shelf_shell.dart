@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+
 enum BookStatus { wantToRead, reading, finished, dropped }
 
 extension BookStatusCopy on BookStatus {
@@ -20,20 +23,20 @@ extension BookStatusCopy on BookStatus {
     switch (this) {
       case BookStatus.wantToRead:
         return brightness == Brightness.light
-            ? const Color(0xff7c6a55)
-            : const Color(0xffd7b995);
+            ? AppColors.wantToReadLight
+            : AppColors.wantToReadDark;
       case BookStatus.reading:
         return brightness == Brightness.light
-            ? const Color(0xff5b5fa8)
-            : const Color(0xffb9b9f1);
+            ? AppColors.readingLight
+            : AppColors.readingDark;
       case BookStatus.finished:
         return brightness == Brightness.light
-            ? const Color(0xff487b66)
-            : const Color(0xffa4d1b7);
+            ? AppColors.finishedLight
+            : AppColors.finishedDark;
       case BookStatus.dropped:
         return brightness == Brightness.light
-            ? const Color(0xffa05c56)
-            : const Color(0xffe0aba4);
+            ? AppColors.droppedLight
+            : AppColors.droppedDark;
     }
   }
 }
@@ -51,8 +54,8 @@ class Book {
     this.review,
     this.startedAt,
     this.finishedAt,
-    this.coverColor = const Color(0xff6b6d9e),
-    this.coverAccent = const Color(0xffd9d6f0),
+    this.coverColor = AppColors.defaultCover,
+    this.coverAccent = AppColors.defaultCoverAccent,
     this.coverIcon = Icons.auto_stories_rounded,
   });
 
@@ -127,8 +130,8 @@ class _ShelfShellState extends State<ShelfShell> {
       totalPages: 432,
       genre: 'Creativity',
       startedAt: DateTime(2026, 8, 12),
-      coverColor: const Color(0xffe07b57),
-      coverAccent: const Color(0xffffdbbe),
+      coverColor: AppColors.coverCoral,
+      coverAccent: AppColors.coverCoralAccent,
       coverIcon: Icons.auto_awesome_rounded,
     ),
     Book(
@@ -142,8 +145,8 @@ class _ShelfShellState extends State<ShelfShell> {
       rating: 4.5,
       review: 'A tender story about friendship, ambition, and the games we build.',
       finishedAt: DateTime(2026, 8, 7),
-      coverColor: const Color(0xff426b70),
-      coverAccent: const Color(0xffc8ebe2),
+      coverColor: AppColors.coverTeal,
+      coverAccent: AppColors.coverTealAccent,
       coverIcon: Icons.gamepad_rounded,
     ),
     Book(
@@ -154,8 +157,8 @@ class _ShelfShellState extends State<ShelfShell> {
       currentPage: 0,
       totalPages: 304,
       genre: 'Fiction',
-      coverColor: const Color(0xff333b77),
-      coverAccent: const Color(0xfff3d99a),
+      coverColor: AppColors.coverNightBlue,
+      coverAccent: AppColors.coverNightBlueAccent,
       coverIcon: Icons.nightlight_round,
     ),
     Book(
@@ -168,8 +171,8 @@ class _ShelfShellState extends State<ShelfShell> {
       genre: 'Productivity',
       rating: 4,
       finishedAt: DateTime(2026, 5, 18),
-      coverColor: const Color(0xff314b65),
-      coverAccent: const Color(0xffb7d2e5),
+      coverColor: AppColors.coverDeepBlue,
+      coverAccent: AppColors.coverDeepBlueAccent,
       coverIcon: Icons.center_focus_strong_rounded,
     ),
     Book(
@@ -180,8 +183,8 @@ class _ShelfShellState extends State<ShelfShell> {
       currentPage: 70,
       totalPages: 408,
       genre: 'Nature',
-      coverColor: const Color(0xff54725f),
-      coverAccent: const Color(0xffd2e5c8),
+      coverColor: AppColors.coverLeaf,
+      coverAccent: AppColors.coverLeafAccent,
       coverIcon: Icons.spa_rounded,
     ),
   ];
@@ -258,7 +261,10 @@ class _ShelfShellState extends State<ShelfShell> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('Update your progress', style: _serif(context, 24)),
+              Text(
+                'Update your progress',
+                style: AppTextStyles.editorial(context, 24),
+              ),
               const SizedBox(height: 6),
               Text(book.title, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 22),
@@ -394,9 +400,19 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('SATURDAY, AUGUST 23', style: _eyebrow(context)),
+                      Text(
+                        'SATURDAY, AUGUST 23',
+                        style: AppTextStyles.eyebrow(context),
+                      ),
                       const SizedBox(height: 8),
-                      Text('Good morning,\nreader.', style: _serif(context, 32, height: 1.04)),
+                      Text(
+                        'Good morning,\nreader.',
+                        style: AppTextStyles.editorial(
+                          context,
+                          32,
+                          height: 1.04,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -499,7 +515,12 @@ class LibraryPage extends StatelessWidget {
           sliver: SliverToBoxAdapter(
             child: Row(
               children: [
-                Expanded(child: Text('Your library', style: _serif(context, 30))),
+                Expanded(
+                  child: Text(
+                    'Your library',
+                    style: AppTextStyles.editorial(context, 30),
+                  ),
+                ),
                 IconButton(onPressed: onAddBook, icon: const Icon(Icons.add_rounded)),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.tune_rounded)),
               ],
@@ -589,9 +610,9 @@ class _AddBookPageState extends State<AddBookPage> {
       return;
     }
     final colors = [
-      [const Color(0xff5b5fa8), const Color(0xffdedcff)],
-      [const Color(0xffd87555), const Color(0xffffd9c4)],
-      [const Color(0xff477765), const Color(0xffd4eddf)],
+      [AppColors.coverIndigo, AppColors.coverIndigoAccent],
+      [AppColors.coverTerracotta, AppColors.coverTerracottaAccent],
+      [AppColors.coverGreen, AppColors.coverGreenAccent],
     ];
     final pair = colors[title.length % colors.length];
     widget.onSave(Book(
@@ -620,7 +641,12 @@ class _AddBookPageState extends State<AddBookPage> {
           sliver: SliverToBoxAdapter(
             child: Row(
               children: [
-                Expanded(child: Text('Add a book', style: _serif(context, 30))),
+                Expanded(
+                  child: Text(
+                    'Add a book',
+                    style: AppTextStyles.editorial(context, 30),
+                  ),
+                ),
                 TextButton(onPressed: widget.onCancel, child: const Text('Cancel')),
               ],
             ),
@@ -634,7 +660,10 @@ class _AddBookPageState extends State<AddBookPage> {
               children: [
                 Center(child: _CoverPicker()),
                 const SizedBox(height: 26),
-                Text('Book details', style: _serif(context, 21)),
+                Text(
+                  'Book details',
+                  style: AppTextStyles.editorial(context, 21),
+                ),
                 const SizedBox(height: 14),
                 TextField(controller: _titleController, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(labelText: 'Title *', hintText: 'What are you reading?')),
                 const SizedBox(height: 12),
@@ -642,7 +671,10 @@ class _AddBookPageState extends State<AddBookPage> {
                 const SizedBox(height: 12),
                 Row(children: [Expanded(child: TextField(controller: _pagesController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Page count'))), const SizedBox(width: 12), Expanded(child: TextField(controller: _yearController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Year')))]),
                 const SizedBox(height: 26),
-                Text('Shelf details', style: _serif(context, 21)),
+                Text(
+                  'Shelf details',
+                  style: AppTextStyles.editorial(context, 21),
+                ),
                 const SizedBox(height: 14),
                 DropdownButtonFormField<BookStatus>(initialValue: _status, decoration: const InputDecoration(labelText: 'Status'), items: BookStatus.values.map((status) => DropdownMenuItem(value: status, child: Text(status.label))).toList(), onChanged: (value) => setState(() => _status = value ?? _status)),
                 const SizedBox(height: 12),
@@ -680,7 +712,7 @@ class StatsPage extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 0), sliver: SliverToBoxAdapter(child: Row(children: [Expanded(child: Text('Reading stats', style: _serif(context, 30))), IconButton(onPressed: () => _showGoalEditor(context, goal, onGoalChanged), icon: const Icon(Icons.edit_outlined))]))),
+        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 0), sliver: SliverToBoxAdapter(child: Row(children: [Expanded(child: Text('Reading stats', style: AppTextStyles.editorial(context, 30))), IconButton(onPressed: () => _showGoalEditor(context, goal, onGoalChanged), icon: const Icon(Icons.edit_outlined))]))),
         SliverPadding(padding: const EdgeInsets.fromLTRB(20, 18, 20, 0), sliver: SliverToBoxAdapter(child: _GoalCard(progress: goal == 0 ? 0.0 : (finishedCount / goal).clamp(0.0, 1.0).toDouble(), count: finishedCount, goal: goal, compact: true))),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
@@ -697,7 +729,7 @@ class StatsPage extends StatelessWidget {
             ],
           ),
         ),
-        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 30, 20, 0), sliver: SliverToBoxAdapter(child: Text('Books per month', style: _serif(context, 21)))),
+        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 30, 20, 0), sliver: SliverToBoxAdapter(child: Text('Books per month', style: AppTextStyles.editorial(context, 21)))),
         SliverPadding(padding: const EdgeInsets.fromLTRB(20, 14, 20, 30), sliver: SliverToBoxAdapter(child: _BarChart(values: values))),
       ],
     );
@@ -731,7 +763,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
       builder: (sheetContext) => Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Update progress', style: _serif(context, 24)),
+          Text('Update progress', style: AppTextStyles.editorial(context, 24)),
           const SizedBox(height: 18),
           TextField(controller: controller, autofocus: true, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Current page', suffixText: _book.totalPages == null ? null : 'of ${_book.totalPages}')),
           const SizedBox(height: 14),
@@ -752,11 +784,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
         child: StatefulBuilder(builder: (context, setSheetState) => SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 42, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor, borderRadius: BorderRadius.circular(8)))),
           const SizedBox(height: 22),
-          Text('A good one to remember.', style: _serif(context, 25)),
+          Text(
+            'A good one to remember.',
+            style: AppTextStyles.editorial(context, 25),
+          ),
           const SizedBox(height: 6),
           Text('How did ${_book.title} feel?', style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 20),
-          ValueListenableBuilder<double>(valueListenable: rating, builder: (_, value, __) => Row(children: List.generate(5, (index) => IconButton(onPressed: () { rating.value = index + 1.0; setSheetState(() {}); }, iconSize: 31, color: index < value ? const Color(0xffd89547) : Theme.of(context).dividerColor, icon: Icon(index < value ? Icons.star_rounded : Icons.star_outline_rounded))))),
+          ValueListenableBuilder<double>(valueListenable: rating, builder: (_, value, __) => Row(children: List.generate(5, (index) => IconButton(onPressed: () { rating.value = index + 1.0; setSheetState(() {}); }, iconSize: 31, color: index < value ? AppColors.star : Theme.of(context).dividerColor, icon: Icon(index < value ? Icons.star_rounded : Icons.star_outline_rounded))))),
           const SizedBox(height: 8),
           TextField(controller: reviewController, maxLines: 4, textCapitalization: TextCapitalization.sentences, decoration: const InputDecoration(labelText: 'Personal review', hintText: 'A few words for future you...')),
           const SizedBox(height: 16),
@@ -778,11 +813,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _BookCover(book: _book, width: 126, height: 188),
           const SizedBox(width: 18),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SizedBox(height: 5), Text(_book.status.label.toUpperCase(), style: _eyebrow(context, color: statusColor)), const SizedBox(height: 10), Text(_book.title, style: _serif(context, 25, height: 1.08)), const SizedBox(height: 8), Text(_book.author, style: Theme.of(context).textTheme.bodyLarge), const SizedBox(height: 16), Wrap(spacing: 6, runSpacing: 6, children: [Chip(label: Text(_book.genre)), if (_book.totalPages != null) Chip(label: Text('${_book.totalPages} pages'))])])),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SizedBox(height: 5), Text(_book.status.label.toUpperCase(), style: AppTextStyles.eyebrow(context, color: statusColor)), const SizedBox(height: 10), Text(_book.title, style: AppTextStyles.editorial(context, 25, height: 1.08)), const SizedBox(height: 8), Text(_book.author, style: Theme.of(context).textTheme.bodyLarge), const SizedBox(height: 16), Wrap(spacing: 6, runSpacing: 6, children: [Chip(label: Text(_book.genre)), if (_book.totalPages != null) Chip(label: Text('${_book.totalPages} pages'))])])),
         ]),
         const SizedBox(height: 28),
         if (progress != null) ...[
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Reading progress', style: _serif(context, 20)), Text('${(progress * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.w800))]),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Reading progress', style: AppTextStyles.editorial(context, 20)), Text('${(progress * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.w800))]),
           const SizedBox(height: 12),
           ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: progress, minHeight: 10)),
           const SizedBox(height: 8),
@@ -794,7 +829,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         _DetailSection(title: 'About this reading', child: Column(children: [if (_book.startedAt != null) _MetaRow(label: 'Started', value: _formatDate(_book.startedAt!)), if (_book.finishedAt != null) _MetaRow(label: 'Finished', value: _formatDate(_book.finishedAt!)), _MetaRow(label: 'Shelf', value: _book.status.label)])),
         if (_book.rating != null || _book.review != null) ...[
           const SizedBox(height: 26),
-          _DetailSection(title: 'Your review', child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (_book.rating != null) Row(children: [const Icon(Icons.star_rounded, color: Color(0xffd89547)), const SizedBox(width: 5), Text('${_book.rating!.toStringAsFixed(1)} / 5', style: const TextStyle(fontWeight: FontWeight.w800))]), if (_book.review != null) ...[const SizedBox(height: 14), Text(_book.review!, style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.55))]])),
+          _DetailSection(title: 'Your review', child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (_book.rating != null) Row(children: [const Icon(Icons.star_rounded, color: AppColors.star), const SizedBox(width: 5), Text('${_book.rating!.toStringAsFixed(1)} / 5', style: const TextStyle(fontWeight: FontWeight.w800))]), if (_book.review != null) ...[const SizedBox(height: 14), Text(_book.review!, style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.55))]])),
         ],
       ]),
     );
@@ -820,7 +855,7 @@ class _ReadingCard extends StatelessWidget {
         child: Row(children: [
           _BookCover(book: book, width: 100, height: 148),
           const SizedBox(width: 14),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: _serif(context, 19, height: 1.1)), const SizedBox(height: 6), Text(book.author, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall), const Spacer(), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('${(progress * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.w800)), Text('${book.currentPage}/${book.totalPages}', style: Theme.of(context).textTheme.bodySmall)]), const SizedBox(height: 7), ClipRRect(borderRadius: BorderRadius.circular(5), child: LinearProgressIndicator(value: progress, minHeight: 7)), const SizedBox(height: 12), SizedBox(width: double.infinity, height: 34, child: OutlinedButton(onPressed: onUpdate, child: const Text('Update')))])),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.editorial(context, 19, height: 1.1)), const SizedBox(height: 6), Text(book.author, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall), const Spacer(), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('${(progress * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.w800)), Text('${book.currentPage}/${book.totalPages}', style: Theme.of(context).textTheme.bodySmall)]), const SizedBox(height: 7), ClipRRect(borderRadius: BorderRadius.circular(5), child: LinearProgressIndicator(value: progress, minHeight: 7)), const SizedBox(height: 12), SizedBox(width: double.infinity, height: 34, child: OutlinedButton(onPressed: onUpdate, child: const Text('Update')))])),
         ]),
       ),
     );
@@ -867,7 +902,7 @@ class _FinishedRow extends StatelessWidget {
                         const Icon(
                           Icons.star_rounded,
                           size: 15,
-                          color: Color(0xffd89547),
+                          color: AppColors.star,
                         ),
                         const SizedBox(width: 3),
                         Text(
@@ -987,7 +1022,7 @@ class _SectionHeader extends StatelessWidget {
   final VoidCallback onAction;
 
   @override
-  Widget build(BuildContext context) => Row(children: [Expanded(child: Text(title, style: _serif(context, 21))), TextButton(onPressed: onAction, child: Text(actionLabel))]);
+  Widget build(BuildContext context) => Row(children: [Expanded(child: Text(title, style: AppTextStyles.editorial(context, 21))), TextButton(onPressed: onAction, child: Text(actionLabel))]);
 }
 
 class _EmptyReadingCard extends StatelessWidget {
@@ -1024,7 +1059,10 @@ class _NoResults extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 14),
-              Text('No books found', style: _serif(context, 21)),
+              Text(
+                'No books found',
+                style: AppTextStyles.editorial(context, 21),
+              ),
               const SizedBox(height: 5),
               Text(
                 query.isEmpty
@@ -1045,7 +1083,7 @@ class _DetailSection extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: _serif(context, 20)), const SizedBox(height: 12), Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(18), border: Border.all(color: Theme.of(context).dividerColor)), child: child)]);
+  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: AppTextStyles.editorial(context, 20)), const SizedBox(height: 12), Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(18), border: Border.all(color: Theme.of(context).dividerColor)), child: child)]);
 }
 
 class _MetaRow extends StatelessWidget {
@@ -1079,10 +1117,6 @@ class _BarChart extends StatelessWidget {
   }
 }
 
-TextStyle _serif(BuildContext context, double size, {double height = 1.2}) => TextStyle(fontFamily: 'Georgia', fontSize: size, height: height, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface);
-
-TextStyle _eyebrow(BuildContext context, {Color? color}) => TextStyle(color: color ?? Theme.of(context).colorScheme.primary, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.4);
-
 String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')} ${_month(date.month)} ${date.year}';
 
 String _month(int month) => const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1];
@@ -1094,7 +1128,7 @@ String _formatNumber(int value) {
 
 Future<void> _showGoalEditor(BuildContext context, int current, ValueChanged<int> onChanged) async {
   final controller = TextEditingController(text: '$current');
-  await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: Text('Annual goal', style: _serif(context, 22)), content: TextField(controller: controller, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Books to finish in 2026')), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')), FilledButton(onPressed: () { final goal = (int.tryParse(controller.text) ?? current).clamp(1, 999).toInt(); onChanged(goal); Navigator.pop(dialogContext); }, child: const Text('Save'))]));
+  await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: Text('Annual goal', style: AppTextStyles.editorial(context, 22)), content: TextField(controller: controller, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Books to finish in 2026')), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')), FilledButton(onPressed: () { final goal = (int.tryParse(controller.text) ?? current).clamp(1, 999).toInt(); onChanged(goal); Navigator.pop(dialogContext); }, child: const Text('Save'))]));
   controller.dispose();
 }
 
