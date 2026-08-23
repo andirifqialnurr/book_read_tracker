@@ -38,18 +38,18 @@ Temuan utama:
 
 ## Phase 1 - Dependencies and Bootstrap
 
-- [ ] Tambahkan dependencies ke `pubspec.yaml`:
-  - [ ] `flutter_riverpod`
-  - [ ] `sqflite`
-  - [ ] `path`
-  - [ ] `path_provider`
-  - [ ] `google_fonts`
-  - [ ] `image_picker`
-- [ ] Jalankan `flutter pub get`.
-- [ ] Ubah `main.dart` menjadi bootstrap ringan dengan `ProviderScope`.
-- [ ] Buat `lib/app/shelf_app.dart`.
-- [ ] Buat `lib/app/shelf_shell.dart`.
-- [ ] Pastikan app masih bisa render setelah bootstrap dipindah.
+- [x] Tambahkan dependencies ke `pubspec.yaml`:
+  - [x] `flutter_riverpod`
+  - [x] `sqflite`
+  - [x] `path`
+  - [x] `path_provider`
+  - [x] `google_fonts`
+  - [x] `image_picker`
+- [x] Jalankan `flutter pub get`.
+- [x] Ubah `main.dart` menjadi bootstrap ringan dengan `ProviderScope`.
+- [x] Buat `lib/app/shelf_app.dart`.
+- [x] Buat `lib/app/shelf_shell.dart`.
+- [x] Pastikan app masih bisa render setelah bootstrap dipindah.
 
 ## Phase 2 - Theme and Design Tokens
 
