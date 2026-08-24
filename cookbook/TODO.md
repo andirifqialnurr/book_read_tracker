@@ -168,15 +168,15 @@ Temuan utama:
 - [x] Buat `lib/core/database/table_names.dart`.
 - [x] Implement schema versi 1 sesuai `schema.md`.
 - [x] Enable foreign keys di `onConfigure`.
-- [ ] Buat DAO:
-  - [ ] `BookDao`
-  - [ ] `TagDao`
-  - [ ] `ReadingGoalDao`
-  - [ ] `ProgressHistoryDao`
-  - [ ] `SettingsDao`
-- [ ] Buat mapper row/domain:
-  - [ ] `BookMapper`
-  - [ ] `ReadingGoalMapper`
+- [x] Buat DAO:
+  - [x] `BookDao`
+  - [x] `TagDao`
+  - [x] `ReadingGoalDao`
+  - [x] `ProgressHistoryDao`
+  - [x] `SettingsDao`
+- [x] Buat mapper row/domain:
+  - [x] `BookMapper`
+  - [x] `ReadingGoalMapper`
 - [ ] Buat repository sqflite:
   - [ ] `SqfliteBookRepository`
   - [ ] `SqfliteReadingGoalRepository`
