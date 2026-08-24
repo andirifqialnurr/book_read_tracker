@@ -209,9 +209,9 @@ Temuan utama:
 
 ## Phase 11 - Cleanup
 
-- [ ] Hapus dummy seed books dari runtime utama atau pindahkan ke dev-only seed.
-- [ ] Pastikan `main.dart` hanya bootstrap.
-- [ ] Pastikan semua import package sesuai nama project di `pubspec.yaml`.
+- [x] Hapus dummy seed books dari runtime utama atau pindahkan ke dev-only seed.
+- [x] Pastikan `main.dart` hanya bootstrap.
+- [x] Pastikan semua import package sesuai nama project di `pubspec.yaml`.
 - [ ] Pastikan tidak ada helper private besar tersisa di screen file.
 - [ ] Pastikan semua file mengikuti folder target di `architecture.md`.
 - [ ] Review lagi `design-system.md` setelah implementasi untuk memastikan kontraknya masih akurat.
