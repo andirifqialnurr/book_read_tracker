@@ -17,6 +17,7 @@ class Book {
     this.review,
     this.startedAt,
     this.finishedAt,
+    this.coverUri,
     this.coverColor = AppColors.defaultCover,
     this.coverAccent = AppColors.defaultCoverAccent,
     this.coverIcon = Icons.auto_stories_rounded,
@@ -36,6 +37,7 @@ class Book {
   String? review;
   DateTime? startedAt;
   DateTime? finishedAt;
+  String? coverUri;
   Color coverColor;
   Color coverAccent;
   IconData coverIcon;
@@ -54,6 +56,7 @@ class Book {
     double? rating,
     String? review,
     DateTime? finishedAt,
+    String? coverUri,
   }) {
     final nextTotalPages = totalPages ?? this.totalPages;
     return Book(
@@ -71,6 +74,7 @@ class Book {
       review: review ?? this.review,
       startedAt: startedAt,
       finishedAt: finishedAt ?? this.finishedAt,
+      coverUri: coverUri ?? this.coverUri,
       coverColor: coverColor,
       coverAccent: coverAccent,
       coverIcon: coverIcon,

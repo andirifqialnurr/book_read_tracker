@@ -20,6 +20,7 @@ class BookMapper {
       review: row['review'] as String?,
       startedAt: _dateFromDb(row['started_at'] as String?),
       finishedAt: _dateFromDb(row['finished_at'] as String?),
+      coverUri: row['cover_uri'] as String?,
       coverColor: _colorFromDb(
         row['cover_color'] as String?,
         fallback: AppColors.defaultCover,
@@ -37,7 +38,7 @@ class BookMapper {
     return {
       'title': book.title,
       'author': book.author,
-      'cover_uri': null,
+      'cover_uri': book.coverUri,
       'cover_color': _colorToDb(book.coverColor),
       'cover_accent': _colorToDb(book.coverAccent),
       'cover_icon': _iconToDb(book.coverIcon),
@@ -59,6 +60,7 @@ class BookMapper {
     return {
       'title': book.title,
       'author': book.author,
+      'cover_uri': book.coverUri,
       'cover_color': _colorToDb(book.coverColor),
       'cover_accent': _colorToDb(book.coverAccent),
       'cover_icon': _iconToDb(book.coverIcon),

@@ -29,6 +29,7 @@ class _BookFormPageState extends State<BookFormPage> {
   late final TextEditingController _yearController;
   late BookStatus _status;
   late String _genre;
+  String? _coverUri;
 
   bool get _isEditing => widget.initialBook != null;
 
@@ -44,6 +45,7 @@ class _BookFormPageState extends State<BookFormPage> {
     _yearController = TextEditingController();
     _status = book?.status ?? BookStatus.wantToRead;
     _genre = book?.genre ?? 'Fiction';
+    _coverUri = book?.coverUri;
   }
 
   @override
@@ -89,6 +91,7 @@ class _BookFormPageState extends State<BookFormPage> {
         startedAt: existing?.startedAt ??
             (_status == BookStatus.reading ? DateTime.now() : null),
         finishedAt: existing?.finishedAt,
+        coverUri: _coverUri,
         coverColor: existing?.coverColor ?? pair[0],
         coverAccent: existing?.coverAccent ?? pair[1],
         coverIcon: existing?.coverIcon ?? Icons.auto_stories_rounded,
@@ -100,6 +103,7 @@ class _BookFormPageState extends State<BookFormPage> {
       _authorController.clear();
       _pagesController.clear();
       _yearController.clear();
+      setState(() => _coverUri = null);
     }
   }
 
@@ -129,7 +133,14 @@ class _BookFormPageState extends State<BookFormPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Center(child: CoverPicker()),
+                Center(
+                  child: CoverPicker(
+                    coverUri: _coverUri,
+                    onCoverChanged: (value) => setState(() {
+                      _coverUri = value;
+                    }),
+                  ),
+                ),
                 const SizedBox(height: 26),
                 Text(
                   'Book details',

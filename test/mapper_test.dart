@@ -21,6 +21,7 @@ void main() {
       review: 'Useful',
       startedAt: DateTime.utc(2026, 8, 20),
       finishedAt: DateTime.utc(2026, 8, 24),
+      coverUri: 'C:\\covers\\mapped-book.jpg',
       coverColor: AppColors.coverTeal,
       coverAccent: AppColors.coverTealAccent,
       coverIcon: Icons.gamepad_rounded,
@@ -30,6 +31,7 @@ void main() {
 
     expect(row['title'], 'Mapped Book');
     expect(row['status'], 'finished');
+    expect(row['cover_uri'], 'C:\\covers\\mapped-book.jpg');
     expect(row['cover_color'], '#426B70');
     expect(row['cover_icon'], 'gamepad');
     expect(row['created_at'], '2026-08-24T12:00:00.000Z');
@@ -42,6 +44,7 @@ void main() {
     expect(mapped.id, 7);
     expect(mapped.status, BookStatus.finished);
     expect(mapped.currentPage, 120);
+    expect(mapped.coverUri, 'C:\\covers\\mapped-book.jpg');
     expect(mapped.coverColor, AppColors.coverTeal);
     expect(mapped.coverIcon, Icons.gamepad_rounded);
   });

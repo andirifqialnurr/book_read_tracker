@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../domain/books/book.dart';
@@ -8,6 +10,54 @@ class BookCover extends StatelessWidget {
     required this.width,
     required this.height,
     super.key,
+  });
+
+  final Book book;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final coverUri = book.coverUri;
+    if (coverUri != null && coverUri.isNotEmpty) {
+      final file = File(coverUri);
+      if (file.existsSync()) {
+        return Container(
+          width: width,
+          height: height,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: book.coverColor.withValues(alpha: .18),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Image.file(
+            file,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _FallbackBookCover(
+              book: book,
+              width: width,
+              height: height,
+            ),
+          ),
+        );
+      }
+    }
+
+    return _FallbackBookCover(book: book, width: width, height: height);
+  }
+}
+
+class _FallbackBookCover extends StatelessWidget {
+  const _FallbackBookCover({
+    required this.book,
+    required this.width,
+    required this.height,
   });
 
   final Book book;

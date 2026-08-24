@@ -186,10 +186,10 @@ Temuan utama:
 
 ## Phase 9 - Cover Handling
 
-- [ ] Tambahkan cover picker dari gallery.
-- [ ] Simpan path/URI cover lokal ke `books.cover_uri`.
-- [ ] Pertahankan cover fallback jika cover kosong atau file tidak tersedia.
-- [ ] Simpan cover fallback color/accent/icon agar konsisten setelah restart.
+- [x] Tambahkan cover picker dari gallery.
+- [x] Simpan path/URI cover lokal ke `books.cover_uri`.
+- [x] Pertahankan cover fallback jika cover kosong atau file tidak tersedia.
+- [x] Simpan cover fallback color/accent/icon agar konsisten setelah restart.
 
 ## Phase 10 - Tests and Validation
 
