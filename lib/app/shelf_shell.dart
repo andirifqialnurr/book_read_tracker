@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
+import '../core/utils/date_formatters.dart';
 import '../domain/books/book.dart';
 import '../domain/books/book_rules.dart';
 import '../domain/books/book_status.dart';
@@ -726,7 +727,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
         Row(children: [Expanded(child: OutlinedButton.icon(onPressed: _showProgress, icon: const Icon(Icons.edit_note_rounded), label: const Text('Update progress'))), const SizedBox(width: 10), Expanded(child: FilledButton.icon(onPressed: _book.status == BookStatus.finished ? _finishBook : _finishBook, icon: const Icon(Icons.check_rounded), label: Text(_book.status == BookStatus.finished ? 'Edit review' : 'Finish book')))]),
         const SizedBox(height: 30),
-        _DetailSection(title: 'About this reading', child: Column(children: [if (_book.startedAt != null) _MetaRow(label: 'Started', value: _formatDate(_book.startedAt!)), if (_book.finishedAt != null) _MetaRow(label: 'Finished', value: _formatDate(_book.finishedAt!)), _MetaRow(label: 'Shelf', value: _book.status.label)])),
+        _DetailSection(title: 'About this reading', child: Column(children: [if (_book.startedAt != null) _MetaRow(label: 'Started', value: formatShelfDate(_book.startedAt!)), if (_book.finishedAt != null) _MetaRow(label: 'Finished', value: formatShelfDate(_book.finishedAt!)), _MetaRow(label: 'Shelf', value: _book.status.label)])),
         if (_book.rating != null || _book.review != null) ...[
           const SizedBox(height: 26),
           _DetailSection(title: 'Your review', child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (_book.rating != null) Row(children: [const Icon(Icons.star_rounded, color: AppColors.star), const SizedBox(width: 5), Text('${_book.rating!.toStringAsFixed(1)} / 5', style: const TextStyle(fontWeight: FontWeight.w800))]), if (_book.review != null) ...[const SizedBox(height: 14), Text(_book.review!, style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.55))]])),
@@ -814,7 +815,7 @@ class _FinishedRow extends StatelessWidget {
                       Text(
                         book.finishedAt == null
                             ? ''
-                            : _formatDate(book.finishedAt!),
+                            : formatShelfDate(book.finishedAt!),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -1016,10 +1017,6 @@ class _BarChart extends StatelessWidget {
     return Container(height: 196, padding: const EdgeInsets.fromLTRB(14, 16, 14, 12), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Theme.of(context).dividerColor)), child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceAround, children: List.generate(values.length, (index) => Column(mainAxisAlignment: MainAxisAlignment.end, children: [Expanded(child: Align(alignment: Alignment.bottomCenter, child: Container(width: 22, height: values[index] * 25, decoration: BoxDecoration(color: index == values.length - 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withValues(alpha: .25), borderRadius: const BorderRadius.vertical(top: Radius.circular(8)))))), const SizedBox(height: 9), Text(labels[index], style: Theme.of(context).textTheme.bodySmall)]))));
   }
 }
-
-String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')} ${_month(date.month)} ${date.year}';
-
-String _month(int month) => const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1];
 
 String _formatNumber(int value) {
   if (value < 1000) return '$value';

@@ -83,10 +83,10 @@ Temuan utama:
 
 ## Phase 4 - Shared Utilities
 
-- [ ] Buat `lib/core/utils/date_formatters.dart`.
+- [x] Buat `lib/core/utils/date_formatters.dart`.
 - [ ] Buat `lib/core/utils/number_formatters.dart`.
-- [ ] Pindahkan `_formatDate`.
-- [ ] Pindahkan `_month`.
+- [x] Pindahkan `_formatDate`.
+- [x] Pindahkan `_month`.
 - [ ] Pindahkan `_formatNumber`.
 - [ ] Tambahkan unit test formatter sederhana.
 
