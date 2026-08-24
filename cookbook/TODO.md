@@ -132,11 +132,11 @@ Temuan utama:
 ### Goals
 
 - [x] Buat `lib/features/goals/widgets/goal_card.dart`.
-- [ ] Buat `lib/features/goals/widgets/goal_editor_dialog.dart`.
+- [x] Buat `lib/features/goals/widgets/goal_editor_dialog.dart`.
 
 ### Stats
 
-- [ ] Buat `lib/features/stats/stats_page.dart`.
+- [x] Buat `lib/features/stats/stats_page.dart`.
 - [x] Buat `lib/features/stats/widgets/stat_tile.dart`.
 - [x] Buat `lib/features/stats/widgets/books_per_month_chart.dart`.
 - [x] Ganti values chart hard-coded dengan data dari provider.
