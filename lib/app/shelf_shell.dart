@@ -7,6 +7,7 @@ import '../core/utils/number_formatters.dart';
 import '../domain/books/book.dart';
 import '../domain/books/book_rules.dart';
 import '../domain/books/book_status.dart';
+import '../features/books/book_form_page.dart';
 import '../features/books/widgets/book_cover.dart';
 import '../features/goals/widgets/goal_card.dart';
 import '../features/home/home_page.dart';
@@ -240,7 +241,7 @@ class _ShelfShellState extends State<ShelfShell> {
               onOpenBook: _openBook,
               onAddBook: () => setState(() => _selectedIndex = 2),
             ),
-            AddBookPage(
+            BookFormPage(
               onCancel: () => setState(() => _selectedIndex = 0),
               onSave: (book) {
                 _addBook(book);
@@ -269,120 +270,6 @@ class _ShelfShellState extends State<ShelfShell> {
           NavigationDestination(icon: Icon(Icons.insights_outlined), selectedIcon: Icon(Icons.insights_rounded), label: 'Stats'),
         ],
       ),
-    );
-  }
-}
-
-class AddBookPage extends StatefulWidget {
-  const AddBookPage({required this.onCancel, required this.onSave, super.key});
-
-  final VoidCallback onCancel;
-  final ValueChanged<Book> onSave;
-
-  @override
-  State<AddBookPage> createState() => _AddBookPageState();
-}
-
-class _AddBookPageState extends State<AddBookPage> {
-  final _titleController = TextEditingController();
-  final _authorController = TextEditingController();
-  final _pagesController = TextEditingController();
-  final _yearController = TextEditingController();
-  BookStatus _status = BookStatus.wantToRead;
-  String _genre = 'Fiction';
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _authorController.dispose();
-    _pagesController.dispose();
-    _yearController.dispose();
-    super.dispose();
-  }
-
-  void _save() {
-    final title = _titleController.text.trim();
-    if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('A title is required')));
-      return;
-    }
-    final colors = [
-      [AppColors.coverIndigo, AppColors.coverIndigoAccent],
-      [AppColors.coverTerracotta, AppColors.coverTerracottaAccent],
-      [AppColors.coverGreen, AppColors.coverGreenAccent],
-    ];
-    final pair = colors[title.length % colors.length];
-    widget.onSave(Book(
-      id: DateTime.now().millisecondsSinceEpoch,
-      title: title,
-      author: _authorController.text.trim().isEmpty ? 'Unknown author' : _authorController.text.trim(),
-      status: _status,
-      totalPages: int.tryParse(_pagesController.text.trim()),
-      genre: _genre,
-      startedAt: _status == BookStatus.reading ? DateTime.now() : null,
-      coverColor: pair[0],
-      coverAccent: pair[1],
-    ));
-    _titleController.clear();
-    _authorController.clear();
-    _pagesController.clear();
-    _yearController.clear();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
-          sliver: SliverToBoxAdapter(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Add a book',
-                    style: AppTextStyles.editorial(context, 30),
-                  ),
-                ),
-                TextButton(onPressed: widget.onCancel, child: const Text('Cancel')),
-              ],
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
-          sliver: SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(child: _CoverPicker()),
-                const SizedBox(height: 26),
-                Text(
-                  'Book details',
-                  style: AppTextStyles.editorial(context, 21),
-                ),
-                const SizedBox(height: 14),
-                TextField(controller: _titleController, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(labelText: 'Title *', hintText: 'What are you reading?')),
-                const SizedBox(height: 12),
-                TextField(controller: _authorController, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(labelText: 'Author', hintText: 'Who wrote it?')),
-                const SizedBox(height: 12),
-                Row(children: [Expanded(child: TextField(controller: _pagesController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Page count'))), const SizedBox(width: 12), Expanded(child: TextField(controller: _yearController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Year')))]),
-                const SizedBox(height: 26),
-                Text(
-                  'Shelf details',
-                  style: AppTextStyles.editorial(context, 21),
-                ),
-                const SizedBox(height: 14),
-                DropdownButtonFormField<BookStatus>(initialValue: _status, decoration: const InputDecoration(labelText: 'Status'), items: BookStatus.values.map((status) => DropdownMenuItem(value: status, child: Text(status.label))).toList(), onChanged: (value) => setState(() => _status = value ?? _status)),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(initialValue: _genre, decoration: const InputDecoration(labelText: 'Genre'), items: const ['Fiction', 'Creativity', 'Productivity', 'Nature', 'Biography', 'Other'].map((genre) => DropdownMenuItem(value: genre, child: Text(genre))).toList(), onChanged: (value) => setState(() => _genre = value ?? _genre)),
-                const SizedBox(height: 24),
-                SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: _save, icon: const Icon(Icons.bookmark_add_outlined), label: const Text('Save to my shelf'))),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -532,14 +419,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 }
-
-class _CoverPicker extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(width: 128, height: 166, decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Theme.of(context).colorScheme.primaryContainer, border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: .25), width: 1.5)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add_photo_alternate_outlined, size: 30, color: Theme.of(context).colorScheme.primary), const SizedBox(height: 10), Text('Add cover', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w800)), const SizedBox(height: 4), Text('Optional', style: Theme.of(context).textTheme.bodySmall)]));
-  }
-}
-
 
 class _StatTile extends StatelessWidget {
   const _StatTile({required this.value, required this.label, required this.icon, this.smallValue = false});

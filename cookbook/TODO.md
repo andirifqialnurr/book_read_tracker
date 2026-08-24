@@ -121,9 +121,9 @@ Temuan utama:
 ### Books
 
 - [ ] Buat `lib/features/books/book_detail_page.dart`.
-- [ ] Buat `lib/features/books/book_form_page.dart`.
+- [x] Buat `lib/features/books/book_form_page.dart`.
 - [x] Buat `lib/features/books/widgets/book_cover.dart`.
-- [ ] Buat `lib/features/books/widgets/cover_picker.dart`.
+- [x] Buat `lib/features/books/widgets/cover_picker.dart`.
 - [ ] Buat `lib/features/books/widgets/progress_sheet.dart`.
 - [ ] Buat `lib/features/books/widgets/finish_review_sheet.dart`.
 - [ ] Tambahkan edit book flow.
