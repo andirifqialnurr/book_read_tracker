@@ -193,19 +193,19 @@ Temuan utama:
 
 ## Phase 10 - Tests and Validation
 
-- [ ] Ganti `test/widget_test.dart` template counter menjadi smoke test `ShelfApp`.
-- [ ] Tambahkan unit test `Book.progress`.
-- [ ] Tambahkan unit test clamp progress.
-- [ ] Tambahkan mapper test row/domain.
-- [ ] Tambahkan provider/controller test untuk:
-  - [ ] Add book.
-  - [ ] Update progress.
-  - [ ] Finish book.
-  - [ ] Filter library.
-  - [ ] Reading goal.
-- [ ] Jalankan `flutter analyze`.
-- [ ] Jalankan `flutter test`.
-- [ ] Jika memungkinkan, jalankan app di device/emulator dan cek light/dark secara visual.
+- [x] Ganti `test/widget_test.dart` template counter menjadi smoke test `ShelfApp`.
+- [x] Tambahkan unit test `Book.progress`.
+- [x] Tambahkan unit test clamp progress.
+- [x] Tambahkan mapper test row/domain.
+- [x] Tambahkan provider/controller test untuk:
+  - [x] Add book.
+  - [x] Update progress.
+  - [x] Finish book.
+  - [x] Filter library.
+  - [x] Reading goal.
+- [x] Jalankan `flutter analyze`.
+- [x] Jalankan `flutter test`.
+- [x] Jika memungkinkan, jalankan app di device/emulator dan cek light/dark secara visual. Tidak tersedia di environment ini: `flutter devices` menggantung dan checkout tidak berisi folder platform runtime.
 
 ## Phase 11 - Cleanup
 
