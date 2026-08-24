@@ -116,7 +116,7 @@ Temuan utama:
 - [x] Buat `lib/features/library/library_filter.dart`.
 - [x] Buat `lib/features/library/widgets/library_book_card.dart`.
 - [x] Tambahkan sort state: Recently Added, Title, Rating, Finished Date.
-- [ ] Pastikan search/filter bekerja dari provider.
+- [x] Pastikan search/filter bekerja dari provider.
 
 ### Books
 
@@ -140,15 +140,15 @@ Temuan utama:
 - [x] Buat `lib/features/stats/widgets/stat_tile.dart`.
 - [x] Buat `lib/features/stats/widgets/books_per_month_chart.dart`.
 - [x] Ganti values chart hard-coded dengan data buku aktif.
-- [ ] Hubungkan chart stats ke provider setelah Phase 7 tersedia.
+- [x] Hubungkan chart stats ke provider.
 
 ## Phase 7 - Riverpod State
 
 - [ ] Buat provider repository in-memory sementara agar refactor UI tidak langsung tergantung SQLite.
 - [ ] Buat `booksProvider`.
 - [ ] Buat `bookByIdProvider`.
-- [ ] Buat `libraryFilterProvider`.
-- [ ] Buat `filteredBooksProvider`.
+- [x] Buat `libraryFilterProvider`.
+- [x] Buat `filteredBooksProvider`.
 - [ ] Buat `currentlyReadingProvider`.
 - [ ] Buat `recentlyFinishedProvider`.
 - [ ] Buat `activeReadingGoalProvider`.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
@@ -8,25 +9,22 @@ import '../domain/books/book_status.dart';
 import '../features/books/book_detail_page.dart';
 import '../features/books/book_form_page.dart';
 import '../features/home/home_page.dart';
-import '../features/library/library_filter.dart';
 import '../features/library/library_page.dart';
+import '../features/library/library_providers.dart';
 import '../features/stats/stats_page.dart';
 
-class ShelfShell extends StatefulWidget {
+class ShelfShell extends ConsumerStatefulWidget {
   const ShelfShell({required this.onToggleTheme, super.key});
 
   final VoidCallback onToggleTheme;
 
   @override
-  State<ShelfShell> createState() => _ShelfShellState();
+  ConsumerState<ShelfShell> createState() => _ShelfShellState();
 }
 
-class _ShelfShellState extends State<ShelfShell> {
+class _ShelfShellState extends ConsumerState<ShelfShell> {
   int _selectedIndex = 0;
   int _goal = 24;
-  String _searchQuery = '';
-  BookStatus? _filter;
-  LibrarySort _librarySort = LibrarySort.recentlyAdded;
   final List<Book> _books = [
     Book(
       id: 1,
@@ -95,18 +93,6 @@ class _ShelfShellState extends State<ShelfShell> {
       coverIcon: Icons.spa_rounded,
     ),
   ];
-
-  List<Book> get _filteredBooks {
-    final filtered = _books.where((book) {
-      final query = _searchQuery.toLowerCase().trim();
-      final matchesQuery = query.isEmpty ||
-          book.title.toLowerCase().contains(query) ||
-          book.author.toLowerCase().contains(query);
-      final matchesFilter = _filter == null || book.status == _filter;
-      return matchesQuery && matchesFilter;
-    }).toList();
-    return sortLibraryBooks(filtered, _librarySort);
-  }
 
   int get _finishedThisYear => _books.where((book) {
         return book.status == BookStatus.finished &&
@@ -210,6 +196,9 @@ class _ShelfShellState extends State<ShelfShell> {
 
   @override
   Widget build(BuildContext context) {
+    final libraryBooks = List<Book>.unmodifiable(_books);
+    final libraryFilter = ref.watch(libraryFilterProvider);
+    final filteredBooks = ref.watch(filteredBooksProvider(libraryBooks));
     final pages = _books.fold<int>(0, (sum, book) => sum + book.currentPage);
     return Scaffold(
       body: SafeArea(
@@ -227,13 +216,13 @@ class _ShelfShellState extends State<ShelfShell> {
               onToggleTheme: widget.onToggleTheme,
             ),
             LibraryPage(
-              books: _filteredBooks,
-              query: _searchQuery,
-              filter: _filter,
-              sort: _librarySort,
-              onQueryChanged: (value) => setState(() => _searchQuery = value),
-              onFilterChanged: (value) => setState(() => _filter = value),
-              onSortChanged: (value) => setState(() => _librarySort = value),
+              books: filteredBooks,
+              query: libraryFilter.query,
+              filter: libraryFilter.status,
+              sort: libraryFilter.sort,
+              onQueryChanged: ref.read(libraryFilterProvider.notifier).setQuery,
+              onFilterChanged: ref.read(libraryFilterProvider.notifier).setStatus,
+              onSortChanged: ref.read(libraryFilterProvider.notifier).setSort,
               onOpenBook: _openBook,
               onAddBook: () => setState(() => _selectedIndex = 2),
             ),
