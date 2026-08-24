@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../domain/books/book.dart';
+import '../../domain/books/book_rules.dart';
 import '../../domain/books/book_status.dart';
 
 class InMemoryBookRepository extends StateNotifier<List<Book>> {
@@ -25,10 +26,70 @@ class InMemoryBookRepository extends StateNotifier<List<Book>> {
   }
 }
 
+class BookFormController {
+  const BookFormController(this._repository);
+
+  final InMemoryBookRepository _repository;
+
+  void addBook(Book book) {
+    _repository.addBook(book);
+  }
+
+  void updateBook(Book book) {
+    _repository.updateBook(book);
+  }
+}
+
+class BookDetailController {
+  const BookDetailController(this._repository);
+
+  final InMemoryBookRepository _repository;
+
+  void updateBook(Book book) {
+    _repository.updateBook(book);
+  }
+
+  void updateProgress(Book book, int currentPage) {
+    final safePage = BookRules.clampProgressPage(
+      currentPage,
+      totalPages: book.totalPages,
+    );
+    _repository.updateBook(book.copyWith(currentPage: safePage));
+  }
+
+  void finishBook(
+    Book book, {
+    double? rating,
+    String? review,
+    DateTime? finishedAt,
+  }) {
+    _repository.updateBook(
+      book.copyWith(
+        status: BookStatus.finished,
+        rating: rating,
+        review: review,
+        finishedAt: finishedAt ?? DateTime.now(),
+      ),
+    );
+  }
+
+  void deleteBook(int id) {
+    _repository.deleteBook(id);
+  }
+}
+
 final bookRepositoryProvider =
     StateNotifierProvider<InMemoryBookRepository, List<Book>>(
   (ref) => InMemoryBookRepository(),
 );
+
+final bookFormControllerProvider = Provider<BookFormController>((ref) {
+  return BookFormController(ref.read(bookRepositoryProvider.notifier));
+});
+
+final bookDetailControllerProvider = Provider<BookDetailController>((ref) {
+  return BookDetailController(ref.read(bookRepositoryProvider.notifier));
+});
 
 final booksProvider = Provider<List<Book>>((ref) {
   return ref.watch(bookRepositoryProvider);

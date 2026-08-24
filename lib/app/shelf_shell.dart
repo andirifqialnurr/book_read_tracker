@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/theme/app_text_styles.dart';
 import '../domain/books/book.dart';
-import '../domain/books/book_rules.dart';
 import '../features/books/book_detail_page.dart';
 import '../features/books/book_form_page.dart';
 import '../features/books/book_providers.dart';
+import '../features/books/widgets/progress_sheet.dart';
 import '../features/goals/goal_providers.dart';
 import '../features/home/home_page.dart';
 import '../features/library/library_providers.dart';
@@ -29,91 +28,16 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
   void _openBook(Book book) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => BookDetailPage(
-          book: book,
-          onUpdate: (updated) {
-            ref.read(bookRepositoryProvider.notifier).updateBook(updated);
-          },
-          onDelete: () {
-            ref.read(bookRepositoryProvider.notifier).deleteBook(book.id);
-          },
-        ),
+        builder: (_) => BookDetailPage(bookId: book.id),
       ),
     );
   }
 
-  void _addBook(Book book) {
-    ref.read(bookRepositoryProvider.notifier).addBook(book);
-    setState(() => _selectedIndex = 1);
-  }
-
-  void _showProgressSheet(Book book) {
-    final controller = TextEditingController(text: '${book.currentPage}');
-    showModalBottomSheet<void>(
+  Future<void> _showProgressSheet(Book book) async {
+    await showProgressSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      builder: (sheetContext) {
-        return Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            18,
-            20,
-            MediaQuery.viewInsetsOf(sheetContext).bottom + 22,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dividerColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Update your progress',
-                style: AppTextStyles.editorial(context, 24),
-              ),
-              const SizedBox(height: 6),
-              Text(book.title, style: Theme.of(context).textTheme.bodyMedium),
-              const SizedBox(height: 22),
-              TextField(
-                controller: controller,
-                autofocus: true,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Current page',
-                  suffixText: 'pages',
-                ),
-              ),
-              const SizedBox(height: 14),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    final page = int.tryParse(controller.text) ?? book.currentPage;
-                    final safePage = BookRules.clampProgressPage(
-                      page,
-                      totalPages: book.totalPages,
-                    );
-                    ref
-                        .read(bookRepositoryProvider.notifier)
-                        .updateBook(book.copyWith(currentPage: safePage));
-                    Navigator.pop(sheetContext);
-                  },
-                  child: const Text('Save progress'),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+      book: book,
+      onUpdate: ref.read(bookDetailControllerProvider).updateBook,
     );
   }
 
@@ -155,7 +79,8 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
             BookFormPage(
               onCancel: () => setState(() => _selectedIndex = 0),
               onSave: (book) {
-                _addBook(book);
+                ref.read(bookFormControllerProvider).addBook(book);
+                setState(() => _selectedIndex = 1);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Book added to your shelf')),
                 );

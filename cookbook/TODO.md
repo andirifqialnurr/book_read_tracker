@@ -154,9 +154,9 @@ Temuan utama:
 - [x] Buat `activeReadingGoalProvider`.
 - [x] Buat `readingStatsProvider`.
 - [x] Buat `themeModeProvider`.
-- [ ] Buat controller/notifier:
-  - [ ] `BookFormController`
-  - [ ] `BookDetailController`
+- [x] Buat controller/notifier:
+  - [x] `BookFormController`
+  - [x] `BookDetailController`
   - [x] `LibraryFilterController`
   - [x] `ReadingGoalController`
   - [x] `ThemeController`

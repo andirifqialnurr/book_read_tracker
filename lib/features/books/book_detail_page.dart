@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
@@ -8,61 +9,58 @@ import '../../domain/books/book_status.dart';
 import '../../shared/widgets/detail_section.dart';
 import '../../shared/widgets/meta_row.dart';
 import 'book_form_page.dart';
+import 'book_providers.dart';
 import 'widgets/book_cover.dart';
 import 'widgets/finish_review_sheet.dart';
 import 'widgets/progress_sheet.dart';
 
-class BookDetailPage extends StatefulWidget {
+class BookDetailPage extends ConsumerWidget {
   const BookDetailPage({
-    required this.book,
-    required this.onUpdate,
-    required this.onDelete,
+    required this.bookId,
     super.key,
   });
 
-  final Book book;
-  final ValueChanged<Book> onUpdate;
-  final VoidCallback onDelete;
+  final int bookId;
 
-  @override
-  State<BookDetailPage> createState() => _BookDetailPageState();
-}
-
-class _BookDetailPageState extends State<BookDetailPage> {
-  late Book _book = widget.book;
-
-  void _update(Book book) {
-    setState(() => _book = book);
-    widget.onUpdate(book);
-  }
-
-  Future<void> _showProgress() async {
+  Future<void> _showProgress(
+    BuildContext context,
+    WidgetRef ref,
+    Book book,
+  ) async {
     await showProgressSheet(
       context: context,
-      book: _book,
-      onUpdate: _update,
+      book: book,
+      onUpdate: ref.read(bookDetailControllerProvider).updateBook,
     );
   }
 
-  Future<void> _finishBook() async {
+  Future<void> _finishBook(
+    BuildContext context,
+    WidgetRef ref,
+    Book book,
+  ) async {
     await showFinishReviewSheet(
       context: context,
-      book: _book,
-      onUpdate: _update,
+      book: book,
+      onUpdate: ref.read(bookDetailControllerProvider).updateBook,
     );
   }
 
-  Future<void> _editBook() async {
+  Future<void> _editBook(
+    BuildContext context,
+    WidgetRef ref,
+    Book book,
+  ) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (editContext) => Scaffold(
           body: SafeArea(
             bottom: false,
             child: BookFormPage(
-              initialBook: _book,
+              initialBook: book,
               onCancel: () => Navigator.pop(editContext),
               onSave: (book) {
-                _update(book);
+                ref.read(bookFormControllerProvider).updateBook(book);
                 Navigator.pop(editContext);
               },
             ),
@@ -72,12 +70,16 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 
-  Future<void> _confirmDelete() async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    Book book,
+  ) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Delete book', style: AppTextStyles.editorial(context, 22)),
-        content: Text('Remove "${_book.title}" from your shelf?'),
+        content: Text('Remove "${book.title}" from your shelf?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -90,15 +92,29 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
       ),
     );
-    if (shouldDelete != true || !mounted) return;
-    widget.onDelete();
+    if (shouldDelete != true || !context.mounted) return;
+    ref.read(bookDetailControllerProvider).deleteBook(book.id);
     Navigator.pop(context);
   }
 
   @override
-  Widget build(BuildContext context) {
-    final progress = _book.progress;
-    final statusColor = _book.status.color(Theme.of(context).brightness);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final book = ref.watch(bookByIdProvider(bookId));
+    if (book == null) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: 'Back',
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+        ),
+        body: const Center(child: Text('Book not found')),
+      );
+    }
+
+    final progress = book.progress;
+    final statusColor = book.status.color(Theme.of(context).brightness);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -112,9 +128,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
             icon: const Icon(Icons.more_horiz_rounded),
             onSelected: (value) {
               if (value == 'edit') {
-                _editBook();
+                _editBook(context, ref, book);
               } else if (value == 'delete') {
-                _confirmDelete();
+                _confirmDelete(context, ref, book);
               }
             },
             itemBuilder: (context) => const [
@@ -130,7 +146,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BookCover(book: _book, width: 126, height: 188),
+              BookCover(book: book, width: 126, height: 188),
               const SizedBox(width: 18),
               Expanded(
                 child: Column(
@@ -138,24 +154,24 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   children: [
                     const SizedBox(height: 5),
                     Text(
-                      _book.status.label.toUpperCase(),
+                      book.status.label.toUpperCase(),
                       style: AppTextStyles.eyebrow(context, color: statusColor),
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      _book.title,
+                      book.title,
                       style: AppTextStyles.editorial(context, 25, height: 1.08),
                     ),
                     const SizedBox(height: 8),
-                    Text(_book.author, style: Theme.of(context).textTheme.bodyLarge),
+                    Text(book.author, style: Theme.of(context).textTheme.bodyLarge),
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 6,
                       runSpacing: 6,
                       children: [
-                        Chip(label: Text(_book.genre)),
-                        if (_book.totalPages != null)
-                          Chip(label: Text('${_book.totalPages} pages')),
+                        Chip(label: Text(book.genre)),
+                        if (book.totalPages != null)
+                          Chip(label: Text('${book.totalPages} pages')),
                       ],
                     ),
                   ],
@@ -185,7 +201,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${_book.currentPage} of ${_book.totalPages} pages',
+              '${book.currentPage} of ${book.totalPages} pages',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 14),
@@ -194,7 +210,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: _showProgress,
+                  onPressed: () => _showProgress(context, ref, book),
                   icon: const Icon(Icons.edit_note_rounded),
                   label: const Text('Update progress'),
                 ),
@@ -202,10 +218,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: _finishBook,
+                  onPressed: () => _finishBook(context, ref, book),
                   icon: const Icon(Icons.check_rounded),
                   label: Text(
-                    _book.status == BookStatus.finished
+                    book.status == BookStatus.finished
                         ? 'Edit review'
                         : 'Finish book',
                   ),
@@ -218,42 +234,42 @@ class _BookDetailPageState extends State<BookDetailPage> {
             title: 'About this reading',
             child: Column(
               children: [
-                if (_book.startedAt != null)
+                if (book.startedAt != null)
                   MetaRow(
                     label: 'Started',
-                    value: formatShelfDate(_book.startedAt!),
+                    value: formatShelfDate(book.startedAt!),
                   ),
-                if (_book.finishedAt != null)
+                if (book.finishedAt != null)
                   MetaRow(
                     label: 'Finished',
-                    value: formatShelfDate(_book.finishedAt!),
+                    value: formatShelfDate(book.finishedAt!),
                   ),
-                MetaRow(label: 'Shelf', value: _book.status.label),
+                MetaRow(label: 'Shelf', value: book.status.label),
               ],
             ),
           ),
-          if (_book.rating != null || _book.review != null) ...[
+          if (book.rating != null || book.review != null) ...[
             const SizedBox(height: 26),
             DetailSection(
               title: 'Your review',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_book.rating != null)
+                  if (book.rating != null)
                     Row(
                       children: [
                         const Icon(Icons.star_rounded, color: AppColors.star),
                         const SizedBox(width: 5),
                         Text(
-                          '${_book.rating!.toStringAsFixed(1)} / 5',
+                          '${book.rating!.toStringAsFixed(1)} / 5',
                           style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
-                  if (_book.review != null) ...[
+                  if (book.review != null) ...[
                     const SizedBox(height: 14),
                     Text(
-                      _book.review!,
+                      book.review!,
                       style: Theme.of(context)
                           .textTheme
                           .bodyLarge

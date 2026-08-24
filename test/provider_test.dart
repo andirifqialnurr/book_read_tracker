@@ -177,6 +177,63 @@ void main() {
     expect(container.read(bookByIdProvider(99)), isNull);
   });
 
+  test('book controllers add, update progress, finish, and delete books', () {
+    final container = ProviderContainer(
+      overrides: [
+        bookRepositoryProvider.overrideWith(
+          (ref) => InMemoryBookRepository(initialBooks: const []),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final formController = container.read(bookFormControllerProvider);
+    final detailController = container.read(bookDetailControllerProvider);
+    final book = Book(
+      id: 10,
+      title: 'Controller Book',
+      author: 'Reader',
+      status: BookStatus.reading,
+      currentPage: 10,
+      totalPages: 100,
+    );
+
+    formController.addBook(book);
+    expect(container.read(bookByIdProvider(10))?.title, 'Controller Book');
+
+    formController.updateBook(
+      Book(
+        id: 10,
+        title: 'Updated Controller Book',
+        author: 'Reader',
+        status: BookStatus.reading,
+        currentPage: 10,
+        totalPages: 100,
+      ),
+    );
+    expect(
+      container.read(bookByIdProvider(10))?.title,
+      'Updated Controller Book',
+    );
+
+    detailController.updateProgress(container.read(bookByIdProvider(10))!, 250);
+    expect(container.read(bookByIdProvider(10))?.currentPage, 100);
+
+    detailController.finishBook(
+      container.read(bookByIdProvider(10))!,
+      rating: 4,
+      review: 'Done',
+      finishedAt: DateTime(2026, 8, 24),
+    );
+    final finished = container.read(bookByIdProvider(10));
+    expect(finished?.status, BookStatus.finished);
+    expect(finished?.rating, 4);
+    expect(finished?.review, 'Done');
+
+    detailController.deleteBook(10);
+    expect(container.read(bookByIdProvider(10)), isNull);
+  });
+
   test('home and goal providers expose derived reading state', () {
     final container = ProviderContainer(
       overrides: [
