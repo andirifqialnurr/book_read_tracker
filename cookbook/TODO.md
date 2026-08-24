@@ -74,12 +74,12 @@ Temuan utama:
 - [x] Buat `lib/domain/books/book_status.dart`.
 - [x] Buat `lib/domain/books/book.dart`.
 - [x] Buat `lib/domain/books/book_rules.dart`.
-- [ ] Pindahkan `BookStatus` dan label/status color mapping.
-- [ ] Pindahkan `Book.progress`.
-- [ ] Tambahkan rule clamp progress:
-  - [ ] Page minimal 0.
-  - [ ] Jika `totalPages` ada, page maksimal `totalPages`.
-- [ ] Pastikan review/rating tidak hilang otomatis saat status berubah.
+- [x] Pindahkan `BookStatus` dan label/status color mapping.
+- [x] Pindahkan `Book.progress`.
+- [x] Tambahkan rule clamp progress:
+  - [x] Page minimal 0.
+  - [x] Jika `totalPages` ada, page maksimal `totalPages`.
+- [x] Pastikan review/rating tidak hilang otomatis saat status berubah.
 
 ## Phase 4 - Shared Utilities
 

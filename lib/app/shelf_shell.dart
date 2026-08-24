@@ -2,109 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
-
-enum BookStatus { wantToRead, reading, finished, dropped }
-
-extension BookStatusCopy on BookStatus {
-  String get label {
-    switch (this) {
-      case BookStatus.wantToRead:
-        return 'Want to read';
-      case BookStatus.reading:
-        return 'Reading';
-      case BookStatus.finished:
-        return 'Finished';
-      case BookStatus.dropped:
-        return 'Dropped';
-    }
-  }
-
-  Color color(Brightness brightness) {
-    switch (this) {
-      case BookStatus.wantToRead:
-        return brightness == Brightness.light
-            ? AppColors.wantToReadLight
-            : AppColors.wantToReadDark;
-      case BookStatus.reading:
-        return brightness == Brightness.light
-            ? AppColors.readingLight
-            : AppColors.readingDark;
-      case BookStatus.finished:
-        return brightness == Brightness.light
-            ? AppColors.finishedLight
-            : AppColors.finishedDark;
-      case BookStatus.dropped:
-        return brightness == Brightness.light
-            ? AppColors.droppedLight
-            : AppColors.droppedDark;
-    }
-  }
-}
-
-class Book {
-  Book({
-    required this.id,
-    required this.title,
-    required this.author,
-    required this.status,
-    this.currentPage = 0,
-    this.totalPages,
-    this.genre = 'Uncategorized',
-    this.rating,
-    this.review,
-    this.startedAt,
-    this.finishedAt,
-    this.coverColor = AppColors.defaultCover,
-    this.coverAccent = AppColors.defaultCoverAccent,
-    this.coverIcon = Icons.auto_stories_rounded,
-  });
-
-  final int id;
-  String title;
-  String author;
-  BookStatus status;
-  int currentPage;
-  int? totalPages;
-  String genre;
-  double? rating;
-  String? review;
-  DateTime? startedAt;
-  DateTime? finishedAt;
-  Color coverColor;
-  Color coverAccent;
-  IconData coverIcon;
-
-  double? get progress {
-    if (totalPages == null || totalPages == 0) return null;
-    return (currentPage / totalPages!).clamp(0, 1).toDouble();
-  }
-
-  Book copyWith({
-    BookStatus? status,
-    int? currentPage,
-    int? totalPages,
-    double? rating,
-    String? review,
-    DateTime? finishedAt,
-  }) {
-    return Book(
-      id: id,
-      title: title,
-      author: author,
-      status: status ?? this.status,
-      currentPage: currentPage ?? this.currentPage,
-      totalPages: totalPages ?? this.totalPages,
-      genre: genre,
-      rating: rating ?? this.rating,
-      review: review ?? this.review,
-      startedAt: startedAt,
-      finishedAt: finishedAt ?? this.finishedAt,
-      coverColor: coverColor,
-      coverAccent: coverAccent,
-      coverIcon: coverIcon,
-    );
-  }
-}
+import '../domain/books/book.dart';
+import '../domain/books/book_rules.dart';
+import '../domain/books/book_status.dart';
 
 class ShelfShell extends StatefulWidget {
   const ShelfShell({required this.onToggleTheme, super.key});
@@ -283,10 +183,10 @@ class _ShelfShellState extends State<ShelfShell> {
                 child: FilledButton(
                   onPressed: () {
                     final page = int.tryParse(controller.text) ?? book.currentPage;
-                    final safePage = (book.totalPages == null
-                            ? page.clamp(0, 999999)
-                            : page.clamp(0, book.totalPages!))
-                        .toInt();
+                    final safePage = BookRules.clampProgressPage(
+                      page,
+                      totalPages: book.totalPages,
+                    );
                     _replaceBook(book.copyWith(currentPage: safePage));
                     Navigator.pop(sheetContext);
                   },
@@ -767,7 +667,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           const SizedBox(height: 18),
           TextField(controller: controller, autofocus: true, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Current page', suffixText: _book.totalPages == null ? null : 'of ${_book.totalPages}')),
           const SizedBox(height: 14),
-          SizedBox(width: double.infinity, child: FilledButton(onPressed: () { final raw = int.tryParse(controller.text) ?? _book.currentPage; final page = (_book.totalPages == null ? raw.clamp(0, 999999) : raw.clamp(0, _book.totalPages!)).toInt(); _update(_book.copyWith(currentPage: page)); Navigator.pop(sheetContext); }, child: const Text('Save progress'))),
+          SizedBox(width: double.infinity, child: FilledButton(onPressed: () { final raw = int.tryParse(controller.text) ?? _book.currentPage; final page = BookRules.clampProgressPage(raw, totalPages: _book.totalPages); _update(_book.copyWith(currentPage: page)); Navigator.pop(sheetContext); }, child: const Text('Save progress'))),
         ]),
       ),
     );
