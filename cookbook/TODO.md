@@ -104,11 +104,11 @@ Temuan utama:
 
 ### Home
 
-- [ ] Buat `lib/features/home/home_page.dart`.
+- [x] Buat `lib/features/home/home_page.dart`.
 - [x] Buat `lib/features/home/widgets/reading_card.dart`.
 - [x] Buat `lib/features/home/widgets/finished_book_row.dart`.
-- [ ] Pertahankan currently reading horizontal card.
-- [ ] Pertahankan recently finished row compact.
+- [x] Pertahankan currently reading horizontal card.
+- [x] Pertahankan recently finished row compact.
 
 ### Library
 
@@ -131,7 +131,7 @@ Temuan utama:
 
 ### Goals
 
-- [ ] Buat `lib/features/goals/widgets/goal_card.dart`.
+- [x] Buat `lib/features/goals/widgets/goal_card.dart`.
 - [ ] Buat `lib/features/goals/widgets/goal_editor_dialog.dart`.
 
 ### Stats
