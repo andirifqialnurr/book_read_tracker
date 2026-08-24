@@ -7,6 +7,9 @@ import '../core/utils/number_formatters.dart';
 import '../domain/books/book.dart';
 import '../domain/books/book_rules.dart';
 import '../domain/books/book_status.dart';
+import '../features/books/widgets/book_cover.dart';
+import '../features/home/widgets/finished_book_row.dart';
+import '../features/home/widgets/reading_card.dart';
 import '../shared/widgets/detail_section.dart';
 import '../shared/widgets/meta_row.dart';
 import '../shared/widgets/no_results.dart';
@@ -358,7 +361,7 @@ class HomePage extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(width: 14),
                       itemBuilder: (context, index) {
                         final book = reading[index];
-                        return _ReadingCard(book: book, onTap: () => onOpenBook(book), onUpdate: () => onUpdateProgress(book));
+                        return ReadingCard(book: book, onTap: () => onOpenBook(book), onUpdate: () => onUpdateProgress(book));
                       },
                     ),
                   ),
@@ -382,7 +385,7 @@ class HomePage extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: _FinishedRow(book: finished[index], onTap: () => onOpenBook(finished[index])),
+                      child: FinishedBookRow(book: finished[index], onTap: () => onOpenBook(finished[index])),
                     ),
                     childCount: finished.length,
                   ),
@@ -718,7 +721,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
       appBar: AppBar(leading: IconButton(tooltip: 'Back', onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded)), actions: [IconButton(tooltip: 'More actions', onPressed: () {}, icon: const Icon(Icons.more_horiz_rounded))]),
       body: ListView(padding: const EdgeInsets.fromLTRB(20, 4, 20, 30), children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _BookCover(book: _book, width: 126, height: 188),
+          BookCover(book: _book, width: 126, height: 188),
           const SizedBox(width: 18),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SizedBox(height: 5), Text(_book.status.label.toUpperCase(), style: AppTextStyles.eyebrow(context, color: statusColor)), const SizedBox(height: 10), Text(_book.title, style: AppTextStyles.editorial(context, 25, height: 1.08)), const SizedBox(height: 8), Text(_book.author, style: Theme.of(context).textTheme.bodyLarge), const SizedBox(height: 16), Wrap(spacing: 6, runSpacing: 6, children: [Chip(label: Text(_book.genre)), if (_book.totalPages != null) Chip(label: Text('${_book.totalPages} pages'))])])),
         ]),
@@ -743,99 +746,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 }
 
-class _ReadingCard extends StatelessWidget {
-  const _ReadingCard({required this.book, required this.onTap, required this.onUpdate});
-
-  final Book book;
-  final VoidCallback onTap;
-  final VoidCallback onUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = book.progress ?? 0;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 310,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: .5)), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .04), blurRadius: 18, offset: const Offset(0, 8))]),
-        child: Row(children: [
-          _BookCover(book: book, width: 100, height: 148),
-          const SizedBox(width: 14),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTextStyles.editorial(context, 19, height: 1.1)), const SizedBox(height: 6), Text(book.author, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall), const Spacer(), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('${(progress * 100).round()}%', style: const TextStyle(fontWeight: FontWeight.w800)), Text('${book.currentPage}/${book.totalPages}', style: Theme.of(context).textTheme.bodySmall)]), const SizedBox(height: 7), ClipRRect(borderRadius: BorderRadius.circular(5), child: LinearProgressIndicator(value: progress, minHeight: 7)), const SizedBox(height: 12), SizedBox(width: double.infinity, height: 34, child: OutlinedButton(onPressed: onUpdate, child: const Text('Update')))])),
-        ]),
-      ),
-    );
-  }
-}
-
-class _FinishedRow extends StatelessWidget {
-  const _FinishedRow({required this.book, required this.onTap});
-  final Book book;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 3),
-        child: Row(
-          children: [
-            _BookCover(book: book, width: 48, height: 68),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    book.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    book.author,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 7),
-                  Row(
-                    children: [
-                      if (book.rating != null) ...[
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 15,
-                          color: AppColors.star,
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          book.rating!.toStringAsFixed(1),
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                      const Spacer(),
-                      Text(
-                        book.finishedAt == null
-                            ? ''
-                            : formatShelfDate(book.finishedAt!),
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _LibraryBookCard extends StatelessWidget {
   const _LibraryBookCard({required this.book, required this.onTap});
   final Book book;
@@ -848,7 +758,7 @@ class _LibraryBookCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _BookCover(book: book, width: double.infinity, height: 218),
+          BookCover(book: book, width: double.infinity, height: 218),
           const SizedBox(height: 10),
           Text(
             book.title,
@@ -886,18 +796,6 @@ class _LibraryBookCard extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _BookCover extends StatelessWidget {
-  const _BookCover({required this.book, required this.width, required this.height});
-  final Book book;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(width: width, height: height, clipBehavior: Clip.antiAlias, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [book.coverColor, Color.lerp(book.coverColor, Colors.black, .34)!]), boxShadow: [BoxShadow(color: book.coverColor.withValues(alpha: .22), blurRadius: 12, offset: const Offset(0, 6))]), child: Stack(children: [Positioned(top: -28, right: -24, child: Container(width: 98, height: 98, decoration: BoxDecoration(shape: BoxShape.circle, color: book.coverAccent.withValues(alpha: .22)))), Positioned(bottom: 14, right: 12, child: Icon(book.coverIcon, color: book.coverAccent.withValues(alpha: .74), size: 27)), Padding(padding: const EdgeInsets.fromLTRB(12, 14, 10, 12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('SHELF', style: TextStyle(color: book.coverAccent.withValues(alpha: .8), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.5)), const Spacer(), Text(book.title, maxLines: 4, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: width < 70 ? 10 : 15, height: 1.05, fontWeight: FontWeight.w800)), const SizedBox(height: 5), Text(book.author, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: book.coverAccent.withValues(alpha: .86), fontSize: width < 70 ? 7 : 9))]))]));
   }
 }
 

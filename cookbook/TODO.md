@@ -105,8 +105,8 @@ Temuan utama:
 ### Home
 
 - [ ] Buat `lib/features/home/home_page.dart`.
-- [ ] Buat `lib/features/home/widgets/reading_card.dart`.
-- [ ] Buat `lib/features/home/widgets/finished_book_row.dart`.
+- [x] Buat `lib/features/home/widgets/reading_card.dart`.
+- [x] Buat `lib/features/home/widgets/finished_book_row.dart`.
 - [ ] Pertahankan currently reading horizontal card.
 - [ ] Pertahankan recently finished row compact.
 
@@ -122,7 +122,7 @@ Temuan utama:
 
 - [ ] Buat `lib/features/books/book_detail_page.dart`.
 - [ ] Buat `lib/features/books/book_form_page.dart`.
-- [ ] Buat `lib/features/books/widgets/book_cover.dart`.
+- [x] Buat `lib/features/books/widgets/book_cover.dart`.
 - [ ] Buat `lib/features/books/widgets/cover_picker.dart`.
 - [ ] Buat `lib/features/books/widgets/progress_sheet.dart`.
 - [ ] Buat `lib/features/books/widgets/finish_review_sheet.dart`.
