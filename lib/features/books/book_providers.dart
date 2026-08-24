@@ -1,27 +1,38 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/database/app_database.dart';
 import '../../core/theme/app_colors.dart';
+import '../../data/books/sqflite_book_repository.dart';
 import '../../domain/books/book.dart';
+import '../../domain/books/book_repository.dart';
 import '../../domain/books/book_rules.dart';
 import '../../domain/books/book_status.dart';
 
-class InMemoryBookRepository extends StateNotifier<List<Book>> {
+class InMemoryBookRepository extends BookRepository {
   InMemoryBookRepository({List<Book>? initialBooks})
       : super(initialBooks ?? _seedBooks);
 
-  void addBook(Book book) {
+  @override
+  Future<void> load() async {}
+
+  @override
+  Future<void> addBook(Book book) async {
     state = [book, ...state];
   }
 
-  void updateBook(Book updated) {
+  @override
+  Future<void> updateBook(Book updated) async {
     state = [
       for (final book in state)
         if (book.id == updated.id) updated else book,
     ];
   }
 
-  void deleteBook(int id) {
+  @override
+  Future<void> deleteBook(int id) async {
     state = state.where((book) => book.id != id).toList();
   }
 }
@@ -29,41 +40,41 @@ class InMemoryBookRepository extends StateNotifier<List<Book>> {
 class BookFormController {
   const BookFormController(this._repository);
 
-  final InMemoryBookRepository _repository;
+  final BookRepository _repository;
 
-  void addBook(Book book) {
-    _repository.addBook(book);
+  Future<void> addBook(Book book) {
+    return _repository.addBook(book);
   }
 
-  void updateBook(Book book) {
-    _repository.updateBook(book);
+  Future<void> updateBook(Book book) {
+    return _repository.updateBook(book);
   }
 }
 
 class BookDetailController {
   const BookDetailController(this._repository);
 
-  final InMemoryBookRepository _repository;
+  final BookRepository _repository;
 
-  void updateBook(Book book) {
-    _repository.updateBook(book);
+  Future<void> updateBook(Book book) {
+    return _repository.updateBook(book);
   }
 
-  void updateProgress(Book book, int currentPage) {
+  Future<void> updateProgress(Book book, int currentPage) {
     final safePage = BookRules.clampProgressPage(
       currentPage,
       totalPages: book.totalPages,
     );
-    _repository.updateBook(book.copyWith(currentPage: safePage));
+    return _repository.updateBook(book.copyWith(currentPage: safePage));
   }
 
-  void finishBook(
+  Future<void> finishBook(
     Book book, {
     double? rating,
     String? review,
     DateTime? finishedAt,
   }) {
-    _repository.updateBook(
+    return _repository.updateBook(
       book.copyWith(
         status: BookStatus.finished,
         rating: rating,
@@ -73,14 +84,18 @@ class BookDetailController {
     );
   }
 
-  void deleteBook(int id) {
-    _repository.deleteBook(id);
+  Future<void> deleteBook(int id) {
+    return _repository.deleteBook(id);
   }
 }
 
 final bookRepositoryProvider =
-    StateNotifierProvider<InMemoryBookRepository, List<Book>>(
-  (ref) => InMemoryBookRepository(),
+    StateNotifierProvider<BookRepository, List<Book>>(
+  (ref) {
+    final repository = SqfliteBookRepository(ref.watch(appDatabaseProvider));
+    unawaited(repository.load());
+    return repository;
+  },
 );
 
 final bookFormControllerProvider = Provider<BookFormController>((ref) {

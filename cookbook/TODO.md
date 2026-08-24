@@ -177,12 +177,12 @@ Temuan utama:
 - [x] Buat mapper row/domain:
   - [x] `BookMapper`
   - [x] `ReadingGoalMapper`
-- [ ] Buat repository sqflite:
-  - [ ] `SqfliteBookRepository`
-  - [ ] `SqfliteReadingGoalRepository`
-- [ ] Ganti provider in-memory menjadi provider SQLite.
-- [ ] Pastikan add/update/delete tetap refresh UI.
-- [ ] Pastikan data tetap ada setelah app restart.
+- [x] Buat repository sqflite:
+  - [x] `SqfliteBookRepository`
+  - [x] `SqfliteReadingGoalRepository`
+- [x] Ganti provider in-memory menjadi provider SQLite.
+- [x] Pastikan add/update/delete tetap refresh UI.
+- [x] Pastikan data tetap ada setelah app restart.
 
 ## Phase 9 - Cover Handling
 

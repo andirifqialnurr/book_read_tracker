@@ -156,7 +156,13 @@ void main() {
   });
 
   test('book repository provider supports add, update, lookup, and delete', () {
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        bookRepositoryProvider.overrideWith(
+          (ref) => InMemoryBookRepository(initialBooks: const []),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
 
     final repository = container.read(bookRepositoryProvider.notifier);
@@ -239,6 +245,9 @@ void main() {
       overrides: [
         bookRepositoryProvider.overrideWith(
           (ref) => InMemoryBookRepository(initialBooks: const []),
+        ),
+        activeReadingGoalProvider.overrideWith(
+          (ref) => ReadingGoalController(),
         ),
       ],
     );
