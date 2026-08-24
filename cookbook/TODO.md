@@ -163,11 +163,11 @@ Temuan utama:
 
 ## Phase 8 - sqflite Persistence
 
-- [ ] Buat `lib/core/database/app_database.dart`.
-- [ ] Buat `lib/core/database/migrations.dart`.
-- [ ] Buat `lib/core/database/table_names.dart`.
-- [ ] Implement schema versi 1 sesuai `schema.md`.
-- [ ] Enable foreign keys di `onConfigure`.
+- [x] Buat `lib/core/database/app_database.dart`.
+- [x] Buat `lib/core/database/migrations.dart`.
+- [x] Buat `lib/core/database/table_names.dart`.
+- [x] Implement schema versi 1 sesuai `schema.md`.
+- [x] Enable foreign keys di `onConfigure`.
 - [ ] Buat DAO:
   - [ ] `BookDao`
   - [ ] `TagDao`
