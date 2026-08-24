@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_book_tracker/app/shelf_app.dart';
+import 'package:shelf_book_tracker/core/theme/app_colors.dart';
 import 'package:shelf_book_tracker/domain/books/book.dart';
 import 'package:shelf_book_tracker/domain/books/book_status.dart';
 import 'package:shelf_book_tracker/features/books/widgets/book_cover.dart';
@@ -53,6 +54,73 @@ void main() {
 
     expect(find.text('Missing Cover'), findsOneWidget);
     expect(find.text('Reader'), findsOneWidget);
+  });
+
+  testWidgets('BookCover fallback color follows book status', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: BookCover(
+            book: Book(
+              id: 1,
+              title: 'Finished Cover',
+              author: 'Reader',
+              status: BookStatus.finished,
+            ),
+            width: 120,
+            height: 160,
+          ),
+        ),
+      ),
+    );
+
+    final cover = tester.widget<Container>(
+      find.byWidgetPredicate((widget) {
+        if (widget is! Container) {
+          return false;
+        }
+        final decoration = widget.decoration;
+        return decoration is BoxDecoration &&
+            decoration.gradient is LinearGradient;
+      }).first,
+    );
+    final decoration = cover.decoration! as BoxDecoration;
+    final gradient = decoration.gradient! as LinearGradient;
+
+    expect(gradient.colors.first, AppColors.coverGreen);
+  });
+
+  testWidgets('recently finished list is wrapped in a bordered card', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          bookRepositoryProvider.overrideWith(
+            (ref) => InMemoryBookRepository(
+              initialBooks: [
+                Book(
+                  id: 1,
+                  title: 'Finished Book',
+                  author: 'Reader',
+                  status: BookStatus.finished,
+                  finishedAt: DateTime(2026, 8, 24),
+                ),
+              ],
+            ),
+          ),
+          activeReadingGoalProvider.overrideWith(
+            (ref) => ReadingGoalController(),
+          ),
+        ],
+        child: const ShelfApp(),
+      ),
+    );
+
+    expect(find.byKey(const Key('recently_finished_card')), findsOneWidget);
+    expect(find.text('Finished Book'), findsWidgets);
   });
 
   testWidgets('progress sheet increments by one before saving', (

@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
 import '../../../domain/books/book.dart';
+import '../../../domain/books/book_status.dart';
 
 class BookCover extends StatelessWidget {
   const BookCover({
@@ -66,6 +68,8 @@ class _FallbackBookCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = _fallbackPalette(book);
+    final isCompact = width < 70 || height < 90;
     return Container(
       width: width,
       height: height,
@@ -76,13 +80,13 @@ class _FallbackBookCover extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            book.coverColor,
-            Color.lerp(book.coverColor, Colors.black, .34)!,
+            palette.color,
+            Color.lerp(palette.color, Colors.black, .34)!,
           ],
         ),
         boxShadow: [
           BoxShadow(
-            color: book.coverColor.withValues(alpha: .22),
+            color: palette.color.withValues(alpha: .22),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -94,59 +98,64 @@ class _FallbackBookCover extends StatelessWidget {
             top: -28,
             right: -24,
             child: Container(
-              width: 98,
-              height: 98,
+              width: isCompact ? 58 : 98,
+              height: isCompact ? 58 : 98,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: book.coverAccent.withValues(alpha: .22),
+                color: palette.accent.withValues(alpha: .22),
               ),
             ),
           ),
           Positioned(
-            bottom: 14,
-            right: 12,
+            bottom: isCompact ? 8 : 14,
+            right: isCompact ? 8 : 12,
             child: Icon(
               book.coverIcon,
-              color: book.coverAccent.withValues(alpha: .74),
-              size: 27,
+              color: palette.accent.withValues(alpha: .74),
+              size: isCompact ? 18 : 27,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 14, 10, 12),
+            padding: isCompact
+                ? const EdgeInsets.fromLTRB(8, 10, 8, 8)
+                : const EdgeInsets.fromLTRB(12, 14, 10, 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'SHELF',
-                  style: TextStyle(
-                    color: book.coverAccent.withValues(alpha: .8),
-                    fontSize: 8,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.5,
+                if (!isCompact)
+                  Text(
+                    'SHELF',
+                    style: TextStyle(
+                      color: palette.accent.withValues(alpha: .8),
+                      fontSize: 8,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.5,
+                    ),
                   ),
-                ),
                 const Spacer(),
                 Text(
                   book.title,
-                  maxLines: 4,
+                  maxLines: isCompact ? 2 : 4,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: width < 70 ? 10 : 15,
+                    fontSize: isCompact ? 9.5 : 15,
                     height: 1.05,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  book.author,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: book.coverAccent.withValues(alpha: .86),
-                    fontSize: width < 70 ? 7 : 9,
+                if (!isCompact) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    book.author,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: palette.accent.withValues(alpha: .86),
+                      fontSize: 9,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -154,4 +163,36 @@ class _FallbackBookCover extends StatelessWidget {
       ),
     );
   }
+
+  _CoverPalette _fallbackPalette(Book book) {
+    switch (book.status) {
+      case BookStatus.wantToRead:
+        return const _CoverPalette(
+          AppColors.coverTerracotta,
+          AppColors.coverTerracottaAccent,
+        );
+      case BookStatus.reading:
+        return const _CoverPalette(
+          AppColors.coverIndigo,
+          AppColors.coverIndigoAccent,
+        );
+      case BookStatus.finished:
+        return const _CoverPalette(
+          AppColors.coverGreen,
+          AppColors.coverGreenAccent,
+        );
+      case BookStatus.dropped:
+        return const _CoverPalette(
+          AppColors.coverDeepBlue,
+          AppColors.coverDeepBlueAccent,
+        );
+    }
+  }
+}
+
+class _CoverPalette {
+  const _CoverPalette(this.color, this.accent);
+
+  final Color color;
+  final Color accent;
 }

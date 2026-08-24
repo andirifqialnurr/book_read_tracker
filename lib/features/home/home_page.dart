@@ -147,20 +147,56 @@ class HomePage extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 )
-              : SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: FinishedBookRow(
-                        book: recentlyFinished[index],
-                        onTap: () => onOpenBook(recentlyFinished[index]),
-                      ),
-                    ),
-                    childCount: recentlyFinished.length,
+              : SliverToBoxAdapter(
+                  child: _RecentlyFinishedCard(
+                    books: recentlyFinished,
+                    onOpenBook: onOpenBook,
                   ),
                 ),
         ),
       ],
+    );
+  }
+}
+
+class _RecentlyFinishedCard extends StatelessWidget {
+  const _RecentlyFinishedCard({
+    required this.books,
+    required this.onOpenBook,
+  });
+
+  final List<Book> books;
+  final ValueChanged<Book> onOpenBook;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      key: const Key('recently_finished_card'),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          children: [
+            for (var index = 0; index < books.length; index++) ...[
+              FinishedBookRow(
+                book: books[index],
+                onTap: () => onOpenBook(books[index]),
+              ),
+              if (index != books.length - 1)
+                Divider(
+                  height: 18,
+                  indent: 74,
+                  endIndent: 16,
+                  color: Theme.of(context).dividerColor.withValues(alpha: .72),
+                ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
