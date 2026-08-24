@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_text_styles.dart';
 import '../domain/books/book.dart';
 import '../domain/books/book_rules.dart';
-import '../domain/books/book_status.dart';
 import '../features/books/book_detail_page.dart';
 import '../features/books/book_form_page.dart';
 import '../features/books/book_providers.dart';
@@ -13,6 +12,7 @@ import '../features/home/home_page.dart';
 import '../features/library/library_providers.dart';
 import '../features/library/library_page.dart';
 import '../features/stats/stats_page.dart';
+import '../features/stats/stats_providers.dart';
 
 class ShelfShell extends ConsumerStatefulWidget {
   const ShelfShell({required this.onToggleTheme, super.key});
@@ -25,10 +25,6 @@ class ShelfShell extends ConsumerStatefulWidget {
 
 class _ShelfShellState extends ConsumerState<ShelfShell> {
   int _selectedIndex = 0;
-  int _finishedThisYear(List<Book> books) => books.where((book) {
-        return book.status == BookStatus.finished &&
-            book.finishedAt?.year == DateTime.now().year;
-      }).length;
 
   void _openBook(Book book) {
     Navigator.of(context).push(
@@ -123,14 +119,12 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
 
   @override
   Widget build(BuildContext context) {
-    final books = ref.watch(booksProvider);
     final currentlyReading = ref.watch(currentlyReadingProvider);
     final recentlyFinished = ref.watch(recentlyFinishedProvider);
     final goal = ref.watch(activeReadingGoalProvider);
     final libraryFilter = ref.watch(libraryFilterProvider);
     final filteredBooks = ref.watch(filteredBooksProvider);
-    final finishedThisYear = _finishedThisYear(books);
-    final pages = books.fold<int>(0, (sum, book) => sum + book.currentPage);
+    final stats = ref.watch(readingStatsProvider);
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -141,7 +135,7 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
               currentlyReading: currentlyReading,
               recentlyFinished: recentlyFinished,
               goal: goal,
-              finishedCount: finishedThisYear,
+              finishedCount: stats.finishedThisYear,
               onOpenBook: _openBook,
               onUpdateProgress: _showProgressSheet,
               onSeeLibrary: () => setState(() => _selectedIndex = 1),
@@ -168,10 +162,7 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
               },
             ),
             StatsPage(
-              books: books,
               goal: goal,
-              finishedCount: finishedThisYear,
-              totalPages: pages,
               onGoalChanged: ref.read(activeReadingGoalProvider.notifier).setGoal,
             ),
           ],

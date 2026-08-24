@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/number_formatters.dart';
-import '../../domain/books/book.dart';
-import '../../domain/books/book_status.dart';
 import '../goals/widgets/goal_card.dart';
 import '../goals/widgets/goal_editor_dialog.dart';
 import 'stats_providers.dart';
@@ -13,37 +11,17 @@ import 'widgets/stat_tile.dart';
 
 class StatsPage extends ConsumerWidget {
   const StatsPage({
-    required this.books,
     required this.goal,
-    required this.finishedCount,
-    required this.totalPages,
     required this.onGoalChanged,
     super.key,
   });
 
-  final List<Book> books;
   final int goal;
-  final int finishedCount;
-  final int totalPages;
   final ValueChanged<int> onGoalChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ratings = books
-        .where((book) => book.rating != null)
-        .map((book) => book.rating!)
-        .toList();
-    final average = ratings.isEmpty ? 0.0 : ratings.reduce((a, b) => a + b) / ratings.length;
-    final genres = <String, int>{};
-    for (final book in books.where((book) => book.status == BookStatus.finished)) {
-      genres[book.genre] = (genres[book.genre] ?? 0) + 1;
-    }
-    final favoriteGenre = genres.entries.isEmpty
-        ? '-'
-        : genres.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
-    final values = ref.watch(
-      booksPerMonthChartProvider(List<Book>.unmodifiable(books)),
-    );
+    final stats = ref.watch(readingStatsProvider);
 
     return CustomScrollView(
       slivers: [
@@ -77,8 +55,8 @@ class StatsPage extends ConsumerWidget {
             child: GoalCard(
               progress: goal == 0
                   ? 0.0
-                  : (finishedCount / goal).clamp(0.0, 1.0).toDouble(),
-              count: finishedCount,
+                  : (stats.finishedThisYear / goal).clamp(0.0, 1.0).toDouble(),
+              count: stats.finishedThisYear,
               goal: goal,
               compact: true,
             ),
@@ -93,22 +71,24 @@ class StatsPage extends ConsumerWidget {
             childAspectRatio: 1.5,
             children: [
               StatTile(
-                value: '$finishedCount',
+                value: '${stats.finishedThisYear}',
                 label: 'Books finished',
                 icon: Icons.check_circle_outline_rounded,
               ),
               StatTile(
-                value: formatCompactNumber(totalPages),
+                value: formatCompactNumber(stats.totalPages),
                 label: 'Pages read',
                 icon: Icons.menu_book_rounded,
               ),
               StatTile(
-                value: average == 0 ? '-' : average.toStringAsFixed(1),
+                value: stats.averageRating == 0
+                    ? '-'
+                    : stats.averageRating.toStringAsFixed(1),
                 label: 'Average rating',
                 icon: Icons.star_outline_rounded,
               ),
               StatTile(
-                value: favoriteGenre,
+                value: stats.favoriteGenre,
                 label: 'Favorite genre',
                 icon: Icons.local_library_outlined,
                 smallValue: true,
@@ -128,7 +108,7 @@ class StatsPage extends ConsumerWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 30),
           sliver: SliverToBoxAdapter(
-            child: BooksPerMonthChart(values: values),
+            child: BooksPerMonthChart(values: stats.booksPerMonth),
           ),
         ),
       ],
