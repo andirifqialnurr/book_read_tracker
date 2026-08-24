@@ -9,6 +9,8 @@ import '../domain/books/book_rules.dart';
 import '../domain/books/book_status.dart';
 import '../features/books/book_form_page.dart';
 import '../features/books/widgets/book_cover.dart';
+import '../features/books/widgets/finish_review_sheet.dart';
+import '../features/books/widgets/progress_sheet.dart';
 import '../features/goals/widgets/goal_card.dart';
 import '../features/home/home_page.dart';
 import '../features/library/library_filter.dart';
@@ -340,51 +342,19 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _showProgress() async {
-    final controller = TextEditingController(text: '${_book.currentPage}');
-    await showModalBottomSheet<void>(
+    await showProgressSheet(
       context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Update progress', style: AppTextStyles.editorial(context, 24)),
-          const SizedBox(height: 18),
-          TextField(controller: controller, autofocus: true, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Current page', suffixText: _book.totalPages == null ? null : 'of ${_book.totalPages}')),
-          const SizedBox(height: 14),
-          SizedBox(width: double.infinity, child: FilledButton(onPressed: () { final raw = int.tryParse(controller.text) ?? _book.currentPage; final page = BookRules.clampProgressPage(raw, totalPages: _book.totalPages); _update(_book.copyWith(currentPage: page)); Navigator.pop(sheetContext); }, child: const Text('Save progress'))),
-        ]),
-      ),
+      book: _book,
+      onUpdate: _update,
     );
   }
 
   Future<void> _finishBook() async {
-    final rating = ValueNotifier<double>(_book.rating ?? 0);
-    final reviewController = TextEditingController(text: _book.review ?? '');
-    await showModalBottomSheet<void>(
+    await showFinishReviewSheet(
       context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) => Padding(
-        padding: EdgeInsets.fromLTRB(20, 18, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 22),
-        child: StatefulBuilder(builder: (context, setSheetState) => SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Center(child: Container(width: 42, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor, borderRadius: BorderRadius.circular(8)))),
-          const SizedBox(height: 22),
-          Text(
-            'A good one to remember.',
-            style: AppTextStyles.editorial(context, 25),
-          ),
-          const SizedBox(height: 6),
-          Text('How did ${_book.title} feel?', style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 20),
-          ValueListenableBuilder<double>(valueListenable: rating, builder: (_, value, __) => Row(children: List.generate(5, (index) => IconButton(tooltip: 'Rate ${index + 1} stars', onPressed: () { rating.value = index + 1.0; setSheetState(() {}); }, iconSize: 31, color: index < value ? AppColors.star : Theme.of(context).dividerColor, icon: Icon(index < value ? Icons.star_rounded : Icons.star_outline_rounded))))),
-          const SizedBox(height: 8),
-          TextField(controller: reviewController, maxLines: 4, textCapitalization: TextCapitalization.sentences, decoration: const InputDecoration(labelText: 'Personal review', hintText: 'A few words for future you...')),
-          const SizedBox(height: 16),
-          SizedBox(width: double.infinity, child: FilledButton(onPressed: () { _update(_book.copyWith(status: BookStatus.finished, rating: rating.value == 0 ? null : rating.value, review: reviewController.text.trim().isEmpty ? null : reviewController.text.trim(), finishedAt: DateTime.now())); Navigator.pop(sheetContext); }, child: const Text('Save as finished'))),
-        ]))),
-      ),
+      book: _book,
+      onUpdate: _update,
     );
-    rating.dispose();
-    reviewController.dispose();
   }
 
   @override
