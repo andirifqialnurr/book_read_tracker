@@ -19,7 +19,24 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
+
+flutter_launcher_icons:
+  image_path: book-stack.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  background_color_ios: "#FAF6D7"
+  web:
+    generate: true
+    image_path: book-stack.png
+    background_color: "#FAF6D7"
+    theme_color: "#F2A21A"
+  windows:
+    generate: true
+    image_path: book-stack.png
+    icon_size: 48
