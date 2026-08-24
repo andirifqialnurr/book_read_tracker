@@ -120,14 +120,14 @@ Temuan utama:
 
 ### Books
 
-- [ ] Buat `lib/features/books/book_detail_page.dart`.
+- [x] Buat `lib/features/books/book_detail_page.dart`.
 - [x] Buat `lib/features/books/book_form_page.dart`.
 - [x] Buat `lib/features/books/widgets/book_cover.dart`.
 - [x] Buat `lib/features/books/widgets/cover_picker.dart`.
 - [x] Buat `lib/features/books/widgets/progress_sheet.dart`.
 - [x] Buat `lib/features/books/widgets/finish_review_sheet.dart`.
-- [ ] Tambahkan edit book flow.
-- [ ] Tambahkan delete book flow dengan konfirmasi.
+- [x] Tambahkan edit book flow.
+- [x] Tambahkan delete book flow dengan konfirmasi.
 
 ### Goals
 
