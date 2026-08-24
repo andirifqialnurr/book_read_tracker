@@ -11,25 +11,25 @@ Future<void> showProgressSheet({
   required BuildContext context,
   required Book book,
   required FutureOr<void> Function(Book book) onUpdate,
-}) {
-  return showModalBottomSheet<void>(
+}) async {
+  final updatedBook = await showModalBottomSheet<Book>(
     context: context,
     isScrollControlled: true,
     builder: (sheetContext) => _ProgressSheetContent(
       book: book,
-      onUpdate: onUpdate,
     ),
   );
+  if (updatedBook != null) {
+    await onUpdate(updatedBook);
+  }
 }
 
 class _ProgressSheetContent extends StatefulWidget {
   const _ProgressSheetContent({
     required this.book,
-    required this.onUpdate,
   });
 
   final Book book;
-  final FutureOr<void> Function(Book book) onUpdate;
 
   @override
   State<_ProgressSheetContent> createState() => _ProgressSheetContentState();
@@ -85,9 +85,8 @@ class _ProgressSheetContentState extends State<_ProgressSheetContent> {
       _currentPage,
       totalPages: widget.book.totalPages,
     );
-    await widget.onUpdate(widget.book.copyWith(currentPage: page));
     if (!mounted) return;
-    Navigator.pop(context);
+    Navigator.pop(context, widget.book.copyWith(currentPage: page));
   }
 
   @override
