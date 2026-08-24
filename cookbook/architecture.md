@@ -1,20 +1,18 @@
 # Architecture - Shelf Book Read Tracker
 
-## 1. Kondisi Saat Ini
+## 1. Kondisi Implementasi
 
-`lib/main.dart` saat ini masih berisi semua bagian aplikasi dalam satu file:
+`lib/main.dart` sekarang hanya berisi bootstrap Flutter dan `ProviderScope`.
+Implementasi utama sudah dipisahkan ke layer berikut:
 
-- Entry point dan `MaterialApp`.
-- Theme light/dark.
-- Enum dan model `Book`.
-- In-memory state untuk books, goal, filter, search, dan theme mode.
-- Navigation shell.
-- Halaman Home, Library, Add Book, Stats, dan Book Detail.
-- Bottom sheets untuk progress dan review.
-- Komponen UI reusable.
-- Helper formatting tanggal, angka, dan text style.
+- `app` untuk `ShelfApp` dan shell navigasi.
+- `core` untuk theme, database helper, migration, table names, dan formatter.
+- `domain` untuk model, enum, rules, dan repository contract.
+- `data` untuk DAO, mapper, dan repository SQLite.
+- `features` untuk screen, provider/controller, sheet, dan widget per fitur.
+- `shared` untuk widget reusable lintas fitur.
 
-Tahap implementasi berikutnya harus memecah file ini berdasarkan fungsi tanpa mengubah karakter desain yang sudah ada.
+Runtime utama memakai SQLite melalui `sqflite`. In-memory repository tetap ada sebagai test/fallback override tanpa dummy seed runtime.
 
 ## 2. Architectural Goals
 
@@ -68,7 +66,7 @@ Aturan:
 - DAO bertanggung jawab atas SQL dan mapping row.
 - Business rules seperti clamp progress ada di controller/domain service, bukan tersebar di widget.
 
-## 5. Target Folder Structure
+## 5. Folder Structure Aktual
 
 ```text
 lib/
@@ -76,7 +74,6 @@ lib/
   app/
     shelf_app.dart
     shelf_shell.dart
-    routes.dart
   core/
     database/
       app_database.dart
@@ -86,6 +83,7 @@ lib/
       app_colors.dart
       app_theme.dart
       app_text_styles.dart
+      theme_providers.dart
     utils/
       date_formatters.dart
       number_formatters.dart
@@ -98,8 +96,6 @@ lib/
     goals/
       reading_goal.dart
       reading_goal_repository.dart
-    stats/
-      reading_stats.dart
   data/
     books/
       book_dao.dart
@@ -111,10 +107,13 @@ lib/
       sqflite_reading_goal_repository.dart
     progress/
       progress_history_dao.dart
+    settings/
+      settings_dao.dart
+    tags/
+      tag_dao.dart
   features/
     home/
       home_page.dart
-      home_providers.dart
       widgets/
         finished_book_row.dart
         reading_card.dart
@@ -127,7 +126,6 @@ lib/
     books/
       book_detail_page.dart
       book_form_page.dart
-      book_form_controller.dart
       book_providers.dart
       widgets/
         book_cover.dart
@@ -145,8 +143,6 @@ lib/
       widgets/
         books_per_month_chart.dart
         stat_tile.dart
-    settings/
-      settings_providers.dart
   shared/
     widgets/
       detail_section.dart
@@ -169,26 +165,25 @@ void main() {
 
 Provider utama:
 
-- `databaseProvider`: membuka database SQLite.
-- `bookRepositoryProvider`: menyediakan repository buku.
+- `appDatabaseProvider`: membuka database SQLite.
+- `bookRepositoryProvider`: menyediakan repository buku SQLite sebagai default.
 - `booksProvider`: memuat semua buku.
 - `bookByIdProvider`: memuat satu buku berdasarkan id.
 - `libraryFilterProvider`: menyimpan query, status filter, dan sort.
 - `filteredBooksProvider`: derived provider dari `booksProvider` dan filter.
 - `currentlyReadingProvider`: derived provider untuk Home.
 - `recentlyFinishedProvider`: derived provider untuk Home.
-- `readingGoalRepositoryProvider`: repository goal.
-- `activeReadingGoalProvider`: goal untuk tahun berjalan.
-- `readingStatsProvider`: statistik dari books, goal, dan progress history.
+- `activeReadingGoalProvider`: repository/controller goal untuk tahun berjalan.
+- `readingStatsProvider`: statistik dari books aktif.
 - `themeModeProvider`: mode theme aktif.
 
 Controller/notifier target:
 
-- `BookFormController`: validasi dan save add/edit.
+- `BookFormController`: save add/edit.
 - `BookDetailController`: update progress, finish review, change status, delete.
 - `LibraryFilterController`: search/filter/sort.
 - `ReadingGoalController`: update goal.
-- `ThemeController`: toggle light/dark/system.
+- `ThemeController`: toggle light/dark.
 
 ## 7. Data Flow
 
@@ -255,22 +250,17 @@ Detail struktur tabel ada di `schema.md`.
 
 ## 11. Testing Strategy
 
-Minimal test setelah refactor:
+Test yang sudah tersedia:
 
 - Unit test untuk `Book.progress` dan business rules clamp progress.
 - Unit test mapper SQLite row <-> domain.
 - Provider/controller test untuk add, update progress, finish book, filter, dan stats.
 - Widget smoke test untuk `ShelfApp`.
-- Widget test untuk empty library dan book tanpa total pages.
-
-Catatan saat ini:
-
-- `test/widget_test.dart` masih template counter dan tidak cocok dengan `ShelfApp`.
-- Test perlu diganti setelah bootstrap Riverpod dibuat.
+- Widget test untuk cover fallback ketika file lokal tidak tersedia.
 
 ## 12. Migration Strategy Dari `main.dart`
 
-Urutan aman:
+Urutan refactor yang sudah dijalankan:
 
 1. Pindahkan enum/model/helper murni tanpa mengubah behavior.
 2. Pindahkan theme ke `core/theme`.
@@ -281,4 +271,4 @@ Urutan aman:
 7. Ganti provider in-memory menjadi provider repository SQLite.
 8. Perbaiki test.
 
-Dengan urutan ini, perubahan desain dapat dijaga sambil mengurangi risiko regressi besar.
+Dengan urutan ini, perubahan desain dijaga sambil memindahkan data utama ke SQLite.

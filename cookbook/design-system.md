@@ -20,11 +20,12 @@ Aplikasi mendukung:
 - `ThemeMode.dark`
 - `ThemeMode.system` sebagai target preferensi setelah state/persistence siap
 
-Prototype saat ini memakai toggle manual di `ShelfApp`. Implementasi berikutnya harus memindahkan state theme ke provider dan menyimpan preferensi di database/local settings.
+State theme saat ini dikelola oleh `themeModeProvider` dan `ThemeController`.
+Preferensi `ThemeMode.system` tetap menjadi target lanjutan untuk persistence settings.
 
 ## 3. Color Tokens
 
-Warna di bawah diambil dari `lib/main.dart` dan harus dijaga sebagai identitas visual awal.
+Warna di bawah sudah dipusatkan di `lib/core/theme/app_colors.dart` dan harus dijaga sebagai identitas visual awal.
 
 ### Core
 
@@ -128,7 +129,7 @@ Cover ratio:
 
 ## 6. Components
 
-Komponen UI harus dipisah per file saat refactor. Nama file target:
+Komponen UI sudah dipisah per file. Lokasi utama:
 
 | Component | Target file | Catatan |
 | --- | --- | --- |
@@ -138,7 +139,7 @@ Komponen UI harus dipisah per file saat refactor. Nama file target:
 | `AppColors` | `lib/core/theme/app_colors.dart` | Color tokens |
 | `AppTextStyles` | `lib/core/theme/app_text_styles.dart` | Text style helpers |
 | `BookCover` | `lib/features/books/widgets/book_cover.dart` | Cover fallback dan cover file lokal |
-| `CoverPicker` | `lib/features/books/widgets/cover_picker.dart` | Picker UI |
+| `CoverPicker` | `lib/features/books/widgets/cover_picker.dart` | Picker gallery dan preview cover lokal |
 | `ReadingCard` | `lib/features/home/widgets/reading_card.dart` | Currently reading card |
 | `FinishedBookRow` | `lib/features/home/widgets/finished_book_row.dart` | Recently finished row |
 | `GoalCard` | `lib/features/goals/widgets/goal_card.dart` | Annual goal card |
@@ -209,7 +210,7 @@ Setiap komponen wajib menangani:
 - Warna status tidak boleh menjadi satu-satunya pembeda; label status tetap ditampilkan.
 - Target tap minimal 44 x 44.
 - Teks pada button tidak boleh overflow.
-- Contrast light/dark harus dicek setelah refactor theme.
+- Contrast light/dark dijaga melalui token theme dan test theme.
 
 ## 10. Implementation Notes
 

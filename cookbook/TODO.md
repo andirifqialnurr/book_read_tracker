@@ -212,6 +212,6 @@ Temuan utama:
 - [x] Hapus dummy seed books dari runtime utama atau pindahkan ke dev-only seed.
 - [x] Pastikan `main.dart` hanya bootstrap.
 - [x] Pastikan semua import package sesuai nama project di `pubspec.yaml`.
-- [ ] Pastikan tidak ada helper private besar tersisa di screen file.
-- [ ] Pastikan semua file mengikuti folder target di `architecture.md`.
-- [ ] Review lagi `design-system.md` setelah implementasi untuk memastikan kontraknya masih akurat.
+- [x] Pastikan tidak ada helper private besar tersisa di screen file.
+- [x] Pastikan semua file mengikuti folder target di `architecture.md`.
+- [x] Review lagi `design-system.md` setelah implementasi untuk memastikan kontraknya masih akurat.
