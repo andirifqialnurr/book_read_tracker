@@ -144,9 +144,9 @@ Temuan utama:
 
 ## Phase 7 - Riverpod State
 
-- [ ] Buat provider repository in-memory sementara agar refactor UI tidak langsung tergantung SQLite.
-- [ ] Buat `booksProvider`.
-- [ ] Buat `bookByIdProvider`.
+- [x] Buat provider repository in-memory sementara agar refactor UI tidak langsung tergantung SQLite.
+- [x] Buat `booksProvider`.
+- [x] Buat `bookByIdProvider`.
 - [x] Buat `libraryFilterProvider`.
 - [x] Buat `filteredBooksProvider`.
 - [ ] Buat `currentlyReadingProvider`.

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/books/book.dart';
 import '../../domain/books/book_status.dart';
+import '../books/book_providers.dart';
 import 'library_filter.dart';
 
 class LibraryFilterState {
@@ -50,8 +51,9 @@ final libraryFilterProvider =
   (ref) => LibraryFilterController(),
 );
 
-final filteredBooksProvider = Provider.family<List<Book>, List<Book>>(
-  (ref, books) {
+final filteredBooksProvider = Provider<List<Book>>(
+  (ref) {
+    final books = ref.watch(booksProvider);
     final filter = ref.watch(libraryFilterProvider);
     final query = filter.query.toLowerCase().trim();
     final filtered = books.where((book) {

@@ -2,13 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_book_tracker/domain/books/book.dart';
 import 'package:shelf_book_tracker/domain/books/book_status.dart';
+import 'package:shelf_book_tracker/features/books/book_providers.dart';
 import 'package:shelf_book_tracker/features/library/library_filter.dart';
 import 'package:shelf_book_tracker/features/library/library_providers.dart';
 import 'package:shelf_book_tracker/features/stats/stats_providers.dart';
 
 void main() {
   test('filteredBooksProvider applies query, status, and sort from provider state', () {
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        bookRepositoryProvider.overrideWith(
+          (ref) => InMemoryBookRepository(initialBooks: const []),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
 
     final books = [
@@ -38,16 +45,27 @@ void main() {
     controller.setStatus(BookStatus.finished);
     controller.setSort(LibrarySort.rating);
 
-    var filtered = container.read(filteredBooksProvider(books));
+    container.read(bookRepositoryProvider.notifier)
+      ..addBook(books[0])
+      ..addBook(books[1])
+      ..addBook(books[2]);
+
+    var filtered = container.read(filteredBooksProvider);
     expect(filtered.map((book) => book.title), ['Tomorrow', 'Deep Work']);
 
     controller.setQuery('deep');
-    filtered = container.read(filteredBooksProvider(books));
+    filtered = container.read(filteredBooksProvider);
     expect(filtered.single.title, 'Deep Work');
   });
 
   test('booksPerMonthChartProvider counts finished books by month', () {
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        bookRepositoryProvider.overrideWith(
+          (ref) => InMemoryBookRepository(initialBooks: const []),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
 
     final books = [
@@ -77,5 +95,27 @@ void main() {
 
     expect(values[4], 2);
     expect(values.where((value) => value > 0), [2]);
+  });
+
+  test('book repository provider supports add, update, lookup, and delete', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final repository = container.read(bookRepositoryProvider.notifier);
+    final book = Book(
+      id: 99,
+      title: 'Provider Book',
+      author: 'Reader',
+      status: BookStatus.wantToRead,
+    );
+
+    repository.addBook(book);
+    expect(container.read(bookByIdProvider(99))?.title, 'Provider Book');
+
+    repository.updateBook(book.copyWith(status: BookStatus.reading));
+    expect(container.read(bookByIdProvider(99))?.status, BookStatus.reading);
+
+    repository.deleteBook(99);
+    expect(container.read(bookByIdProvider(99)), isNull);
   });
 }
