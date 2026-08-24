@@ -1,11 +1,11 @@
 {
-    "name": "book_read_tracker",
-    "short_name": "book_read_tracker",
+    "name": "Shelf",
+    "short_name": "Shelf",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A warm, editorial reading journal.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
