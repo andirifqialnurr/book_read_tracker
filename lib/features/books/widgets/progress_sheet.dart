@@ -37,7 +37,9 @@ class _ProgressSheetContent extends StatefulWidget {
 
 class _ProgressSheetContentState extends State<_ProgressSheetContent> {
   late final TextEditingController _controller;
+  final _focusNode = FocusNode();
   bool _isSaving = false;
+  bool _isManualEditing = false;
 
   @override
   void initState() {
@@ -47,16 +49,40 @@ class _ProgressSheetContentState extends State<_ProgressSheetContent> {
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  int get _currentPage {
+    return int.tryParse(_controller.text) ?? widget.book.currentPage;
+  }
+
+  void _incrementPage() {
+    final nextPage = BookRules.clampProgressPage(
+      _currentPage + 1,
+      totalPages: widget.book.totalPages,
+    );
+    setState(() => _controller.text = '$nextPage');
+  }
+
+  void _startManualEditing() {
+    setState(() => _isManualEditing = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _focusNode.requestFocus();
+      _controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _controller.text.length,
+      );
+    });
   }
 
   Future<void> _save() async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
-    final raw = int.tryParse(_controller.text) ?? widget.book.currentPage;
     final page = BookRules.clampProgressPage(
-      raw,
+      _currentPage,
       totalPages: widget.book.totalPages,
     );
     await widget.onUpdate(widget.book.copyWith(currentPage: page));
@@ -84,18 +110,27 @@ class _ProgressSheetContentState extends State<_ProgressSheetContent> {
                   style: AppTextStyles.editorial(context, 24),
                 ),
                 const SizedBox(height: 18),
-                TextField(
-                  controller: _controller,
-                  autofocus: true,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    labelText: 'Current page',
-                    suffixText: widget.book.totalPages == null
-                        ? null
-                        : 'of ${widget.book.totalPages}',
-                  ),
-                ),
+                _isManualEditing
+                    ? TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: InputDecoration(
+                          labelText: 'Current page',
+                          suffixText: widget.book.totalPages == null
+                              ? null
+                              : 'of ${widget.book.totalPages}',
+                        ),
+                      )
+                    : _ProgressStepper(
+                        currentPage: _currentPage,
+                        totalPages: widget.book.totalPages,
+                        onEdit: _startManualEditing,
+                        onIncrement: _incrementPage,
+                      ),
                 const SizedBox(height: 14),
                 SizedBox(
                   width: double.infinity,
@@ -109,6 +144,82 @@ class _ProgressSheetContentState extends State<_ProgressSheetContent> {
           );
         },
       ),
+    );
+  }
+}
+
+class _ProgressStepper extends StatelessWidget {
+  const _ProgressStepper({
+    required this.currentPage,
+    required this.totalPages,
+    required this.onEdit,
+    required this.onIncrement,
+  });
+
+  final int currentPage;
+  final int? totalPages;
+  final VoidCallback onEdit;
+  final VoidCallback onIncrement;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Expanded(
+          child: Tooltip(
+            message: 'Edit current page',
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onEdit,
+              child: Container(
+                height: 66,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: theme.inputDecorationTheme.fillColor ??
+                      theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: theme.dividerColor),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      '$currentPage',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (totalPages != null) ...[
+                      const SizedBox(width: 8),
+                      Text(
+                        'of $totalPages',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Tooltip(
+          message: 'Add one page',
+          child: SizedBox.square(
+            dimension: 54,
+            child: FilledButton(
+              onPressed: onIncrement,
+              style: FilledButton.styleFrom(
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Icon(Icons.add_rounded),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

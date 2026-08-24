@@ -55,7 +55,7 @@ void main() {
     expect(find.text('Reader'), findsOneWidget);
   });
 
-  testWidgets('progress sheet clamps input and closes after async save', (
+  testWidgets('progress sheet increments by one before saving', (
     WidgetTester tester,
   ) async {
     Book? updatedBook;
@@ -90,6 +90,57 @@ void main() {
     );
 
     await tester.tap(find.text('Open progress'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsNothing);
+    expect(find.text('12'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.add_rounded));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save progress'));
+    await tester.pumpAndSettle();
+
+    expect(updatedBook?.currentPage, 13);
+    expect(find.text('Update progress'), findsNothing);
+  });
+
+  testWidgets('progress sheet allows manual input after tapping the page number', (
+    WidgetTester tester,
+  ) async {
+    Book? updatedBook;
+    final book = Book(
+      id: 1,
+      title: 'Progress Book',
+      author: 'Reader',
+      status: BookStatus.reading,
+      currentPage: 12,
+      totalPages: 100,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => FilledButton(
+              onPressed: () {
+                showProgressSheet(
+                  context: context,
+                  book: book,
+                  onUpdate: (updated) async {
+                    updatedBook = updated;
+                  },
+                );
+              },
+              child: const Text('Open progress'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open progress'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('12'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '250');
     await tester.tap(find.text('Save progress'));
