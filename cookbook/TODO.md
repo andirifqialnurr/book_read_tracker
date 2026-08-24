@@ -71,9 +71,9 @@ Temuan utama:
 
 ## Phase 3 - Domain Models and Rules
 
-- [ ] Buat `lib/domain/books/book_status.dart`.
-- [ ] Buat `lib/domain/books/book.dart`.
-- [ ] Buat `lib/domain/books/book_rules.dart`.
+- [x] Buat `lib/domain/books/book_status.dart`.
+- [x] Buat `lib/domain/books/book.dart`.
+- [x] Buat `lib/domain/books/book_rules.dart`.
 - [ ] Pindahkan `BookStatus` dan label/status color mapping.
 - [ ] Pindahkan `Book.progress`.
 - [ ] Tambahkan rule clamp progress:
