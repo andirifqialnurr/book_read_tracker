@@ -10,10 +10,10 @@ import '../domain/books/book_status.dart';
 import '../features/books/widgets/book_cover.dart';
 import '../features/goals/widgets/goal_card.dart';
 import '../features/home/home_page.dart';
+import '../features/library/library_filter.dart';
+import '../features/library/library_page.dart';
 import '../shared/widgets/detail_section.dart';
 import '../shared/widgets/meta_row.dart';
-import '../shared/widgets/no_results.dart';
-import '../shared/widgets/shelf_filter_chip.dart';
 
 class ShelfShell extends StatefulWidget {
   const ShelfShell({required this.onToggleTheme, super.key});
@@ -29,6 +29,7 @@ class _ShelfShellState extends State<ShelfShell> {
   int _goal = 24;
   String _searchQuery = '';
   BookStatus? _filter;
+  LibrarySort _librarySort = LibrarySort.recentlyAdded;
   final List<Book> _books = [
     Book(
       id: 1,
@@ -99,7 +100,7 @@ class _ShelfShellState extends State<ShelfShell> {
   ];
 
   List<Book> get _filteredBooks {
-    return _books.where((book) {
+    final filtered = _books.where((book) {
       final query = _searchQuery.toLowerCase().trim();
       final matchesQuery = query.isEmpty ||
           book.title.toLowerCase().contains(query) ||
@@ -107,6 +108,7 @@ class _ShelfShellState extends State<ShelfShell> {
       final matchesFilter = _filter == null || book.status == _filter;
       return matchesQuery && matchesFilter;
     }).toList();
+    return sortLibraryBooks(filtered, _librarySort);
   }
 
   int get _finishedThisYear => _books.where((book) {
@@ -231,8 +233,10 @@ class _ShelfShellState extends State<ShelfShell> {
               books: _filteredBooks,
               query: _searchQuery,
               filter: _filter,
+              sort: _librarySort,
               onQueryChanged: (value) => setState(() => _searchQuery = value),
               onFilterChanged: (value) => setState(() => _filter = value),
+              onSortChanged: (value) => setState(() => _librarySort = value),
               onOpenBook: _openBook,
               onAddBook: () => setState(() => _selectedIndex = 2),
             ),
@@ -265,96 +269,6 @@ class _ShelfShellState extends State<ShelfShell> {
           NavigationDestination(icon: Icon(Icons.insights_outlined), selectedIcon: Icon(Icons.insights_rounded), label: 'Stats'),
         ],
       ),
-    );
-  }
-}
-
-class LibraryPage extends StatelessWidget {
-  const LibraryPage({
-    required this.books,
-    required this.query,
-    required this.filter,
-    required this.onQueryChanged,
-    required this.onFilterChanged,
-    required this.onOpenBook,
-    required this.onAddBook,
-    super.key,
-  });
-
-  final List<Book> books;
-  final String query;
-  final BookStatus? filter;
-  final ValueChanged<String> onQueryChanged;
-  final ValueChanged<BookStatus?> onFilterChanged;
-  final ValueChanged<Book> onOpenBook;
-  final VoidCallback onAddBook;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
-          sliver: SliverToBoxAdapter(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Your library',
-                    style: AppTextStyles.editorial(context, 30),
-                  ),
-                ),
-                IconButton(tooltip: 'Add book', onPressed: onAddBook, icon: const Icon(Icons.add_rounded)),
-                IconButton(tooltip: 'Filter library', onPressed: () {}, icon: const Icon(Icons.tune_rounded)),
-              ],
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-          sliver: SliverToBoxAdapter(
-            child: TextField(
-              onChanged: onQueryChanged,
-              decoration: const InputDecoration(
-                hintText: 'Search title or author',
-                prefixIcon: Icon(Icons.search_rounded),
-              ),
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 14, 0, 0),
-          sliver: SliverToBoxAdapter(
-            child: SizedBox(
-              height: 38,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  ShelfFilterChip(label: 'All books', selected: filter == null, onTap: () => onFilterChanged(null)),
-                  ...BookStatus.values.map((status) => ShelfFilterChip(label: status.label, selected: filter == status, onTap: () => onFilterChanged(status))),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
-          sliver: books.isEmpty
-              ? SliverToBoxAdapter(child: NoResults(query: query))
-              : SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => _LibraryBookCard(book: books[index], onTap: () => onOpenBook(books[index])),
-                    childCount: books.length,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 24,
-                    childAspectRatio: .61,
-                  ),
-                ),
-        ),
-      ],
     );
   }
 }
@@ -615,59 +529,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
           DetailSection(title: 'Your review', child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (_book.rating != null) Row(children: [const Icon(Icons.star_rounded, color: AppColors.star), const SizedBox(width: 5), Text('${_book.rating!.toStringAsFixed(1)} / 5', style: const TextStyle(fontWeight: FontWeight.w800))]), if (_book.review != null) ...[const SizedBox(height: 14), Text(_book.review!, style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.55))]])),
         ],
       ]),
-    );
-  }
-}
-
-class _LibraryBookCard extends StatelessWidget {
-  const _LibraryBookCard({required this.book, required this.onTap});
-  final Book book;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BookCover(book: book, width: double.infinity, height: 218),
-          const SizedBox(height: 10),
-          Text(
-            book.title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w800, height: 1.15),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            book.author,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(height: 7),
-          Row(
-            children: [
-              Container(
-                width: 7,
-                height: 7,
-                decoration: BoxDecoration(
-                  color: book.status.color(Theme.of(context).brightness),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: Text(
-                  book.status.label,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

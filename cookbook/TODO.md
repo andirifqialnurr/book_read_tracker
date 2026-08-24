@@ -112,10 +112,10 @@ Temuan utama:
 
 ### Library
 
-- [ ] Buat `lib/features/library/library_page.dart`.
-- [ ] Buat `lib/features/library/library_filter.dart`.
-- [ ] Buat `lib/features/library/widgets/library_book_card.dart`.
-- [ ] Tambahkan sort state: Recently Added, Title, Rating, Finished Date.
+- [x] Buat `lib/features/library/library_page.dart`.
+- [x] Buat `lib/features/library/library_filter.dart`.
+- [x] Buat `lib/features/library/widgets/library_book_card.dart`.
+- [x] Tambahkan sort state: Recently Added, Title, Rating, Finished Date.
 - [ ] Pastikan search/filter bekerja dari provider.
 
 ### Books
