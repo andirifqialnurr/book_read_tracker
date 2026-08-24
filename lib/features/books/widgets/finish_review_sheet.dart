@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -8,7 +10,7 @@ import '../../../domain/books/book_status.dart';
 Future<void> showFinishReviewSheet({
   required BuildContext context,
   required Book book,
-  required ValueChanged<Book> onUpdate,
+  required FutureOr<void> Function(Book book) onUpdate,
 }) async {
   final rating = ValueNotifier<double>(book.rating ?? 0);
   final reviewController = TextEditingController(text: book.review ?? '');
@@ -86,8 +88,8 @@ Future<void> showFinishReviewSheet({
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: () {
-                    onUpdate(
+                  onPressed: () async {
+                    await onUpdate(
                       book.copyWith(
                         status: BookStatus.finished,
                         rating: rating.value == 0 ? null : rating.value,
@@ -97,7 +99,9 @@ Future<void> showFinishReviewSheet({
                         finishedAt: DateTime.now(),
                       ),
                     );
-                    Navigator.pop(sheetContext);
+                    if (sheetContext.mounted) {
+                      Navigator.pop(sheetContext);
+                    }
                   },
                   child: const Text('Save as finished'),
                 ),

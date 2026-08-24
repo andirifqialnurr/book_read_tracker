@@ -5,6 +5,7 @@ import 'package:shelf_book_tracker/app/shelf_app.dart';
 import 'package:shelf_book_tracker/domain/books/book.dart';
 import 'package:shelf_book_tracker/domain/books/book_status.dart';
 import 'package:shelf_book_tracker/features/books/widgets/book_cover.dart';
+import 'package:shelf_book_tracker/features/books/widgets/progress_sheet.dart';
 import 'package:shelf_book_tracker/features/books/book_providers.dart';
 import 'package:shelf_book_tracker/features/goals/goal_providers.dart';
 
@@ -52,5 +53,49 @@ void main() {
 
     expect(find.text('Missing Cover'), findsOneWidget);
     expect(find.text('Reader'), findsOneWidget);
+  });
+
+  testWidgets('progress sheet clamps input and closes after async save', (
+    WidgetTester tester,
+  ) async {
+    Book? updatedBook;
+    final book = Book(
+      id: 1,
+      title: 'Progress Book',
+      author: 'Reader',
+      status: BookStatus.reading,
+      currentPage: 12,
+      totalPages: 100,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => FilledButton(
+              onPressed: () {
+                showProgressSheet(
+                  context: context,
+                  book: book,
+                  onUpdate: (updated) async {
+                    updatedBook = updated;
+                  },
+                );
+              },
+              child: const Text('Open progress'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open progress'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '250');
+    await tester.tap(find.text('Save progress'));
+    await tester.pumpAndSettle();
+
+    expect(updatedBook?.currentPage, 100);
+    expect(find.text('Update progress'), findsNothing);
   });
 }
