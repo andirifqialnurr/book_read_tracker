@@ -12,6 +12,8 @@ import '../features/goals/widgets/goal_card.dart';
 import '../features/home/home_page.dart';
 import '../features/library/library_filter.dart';
 import '../features/library/library_page.dart';
+import '../features/stats/widgets/books_per_month_chart.dart';
+import '../features/stats/widgets/stat_tile.dart';
 
 class ShelfShell extends StatefulWidget {
   const ShelfShell({required this.onToggleTheme, super.key});
@@ -289,7 +291,13 @@ class StatsPage extends StatelessWidget {
       genres[book.genre] = (genres[book.genre] ?? 0) + 1;
     }
     final favoriteGenre = genres.entries.isEmpty ? '—' : genres.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
-    final values = [2.0, 4.0, 1.0, 3.0, 2.5, 4.0, 3.0, 5.0];
+    final values = List<double>.generate(8, (index) {
+      final month = index + 1;
+      return books.where((book) {
+        return book.finishedAt?.year == DateTime.now().year &&
+            book.finishedAt?.month == month;
+      }).length.toDouble();
+    });
 
     return CustomScrollView(
       slivers: [
@@ -303,47 +311,23 @@ class StatsPage extends StatelessWidget {
             mainAxisSpacing: 12,
             childAspectRatio: 1.5,
             children: [
-              _StatTile(value: '$finishedCount', label: 'Books finished', icon: Icons.check_circle_outline_rounded),
-              _StatTile(value: formatCompactNumber(totalPages), label: 'Pages read', icon: Icons.menu_book_rounded),
-              _StatTile(value: average == 0 ? '—' : average.toStringAsFixed(1), label: 'Average rating', icon: Icons.star_outline_rounded),
-              _StatTile(value: favoriteGenre, label: 'Favorite genre', icon: Icons.local_library_outlined, smallValue: true),
+              StatTile(value: '$finishedCount', label: 'Books finished', icon: Icons.check_circle_outline_rounded),
+              StatTile(value: formatCompactNumber(totalPages), label: 'Pages read', icon: Icons.menu_book_rounded),
+              StatTile(value: average == 0 ? '—' : average.toStringAsFixed(1), label: 'Average rating', icon: Icons.star_outline_rounded),
+              StatTile(value: favoriteGenre, label: 'Favorite genre', icon: Icons.local_library_outlined, smallValue: true),
             ],
           ),
         ),
         SliverPadding(padding: const EdgeInsets.fromLTRB(20, 30, 20, 0), sliver: SliverToBoxAdapter(child: Text('Books per month', style: AppTextStyles.editorial(context, 21)))),
-        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 14, 20, 30), sliver: SliverToBoxAdapter(child: _BarChart(values: values))),
+        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 14, 20, 30), sliver: SliverToBoxAdapter(child: BooksPerMonthChart(values: values))),
       ],
     );
   }
 }
 
-class _StatTile extends StatelessWidget {
-  const _StatTile({required this.value, required this.label, required this.icon, this.smallValue = false});
-  final String value;
-  final String label;
-  final IconData icon;
-  final bool smallValue;
-
-  @override
-  Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(18), border: Border.all(color: Theme.of(context).dividerColor)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(icon, size: 19, color: Theme.of(context).colorScheme.primary), const Spacer(), Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: smallValue ? 17 : 24, fontWeight: FontWeight.w800)), const SizedBox(height: 2), Text(label, style: Theme.of(context).textTheme.bodySmall)]));
-}
-
-class _BarChart extends StatelessWidget {
-  const _BarChart({required this.values});
-  final List<double> values;
-
-  @override
-  Widget build(BuildContext context) {
-    const labels = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A'];
-    return Container(height: 196, padding: const EdgeInsets.fromLTRB(14, 16, 14, 12), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Theme.of(context).dividerColor)), child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceAround, children: List.generate(values.length, (index) => Column(mainAxisAlignment: MainAxisAlignment.end, children: [Expanded(child: Align(alignment: Alignment.bottomCenter, child: Container(width: 22, height: values[index] * 25, decoration: BoxDecoration(color: index == values.length - 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withValues(alpha: .25), borderRadius: const BorderRadius.vertical(top: Radius.circular(8)))))), const SizedBox(height: 9), Text(labels[index], style: Theme.of(context).textTheme.bodySmall)]))));
-  }
-}
 
 Future<void> _showGoalEditor(BuildContext context, int current, ValueChanged<int> onChanged) async {
   final controller = TextEditingController(text: '$current');
   await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: Text('Annual goal', style: AppTextStyles.editorial(context, 22)), content: TextField(controller: controller, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Books to finish in 2026')), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')), FilledButton(onPressed: () { final goal = (int.tryParse(controller.text) ?? current).clamp(1, 999).toInt(); onChanged(goal); Navigator.pop(dialogContext); }, child: const Text('Save'))]));
   controller.dispose();
 }
-
-
-
