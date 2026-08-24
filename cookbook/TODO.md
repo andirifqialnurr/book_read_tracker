@@ -139,7 +139,8 @@ Temuan utama:
 - [x] Buat `lib/features/stats/stats_page.dart`.
 - [x] Buat `lib/features/stats/widgets/stat_tile.dart`.
 - [x] Buat `lib/features/stats/widgets/books_per_month_chart.dart`.
-- [x] Ganti values chart hard-coded dengan data dari provider.
+- [x] Ganti values chart hard-coded dengan data buku aktif.
+- [ ] Hubungkan chart stats ke provider setelah Phase 7 tersedia.
 
 ## Phase 7 - Riverpod State
 
