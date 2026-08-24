@@ -22,7 +22,13 @@ final activeReadingGoalProvider =
     StateNotifierProvider<ReadingGoalRepository, int>(
   (ref) {
     final repository = SqfliteReadingGoalRepository(ref.watch(appDatabaseProvider));
-    unawaited(repository.load());
+    var disposed = false;
+    ref.onDispose(() => disposed = true);
+    Timer.run(() {
+      if (!disposed) {
+        unawaited(repository.load());
+      }
+    });
     return repository;
   },
 );

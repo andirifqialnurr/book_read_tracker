@@ -91,7 +91,13 @@ final bookRepositoryProvider =
     StateNotifierProvider<BookRepository, List<Book>>(
   (ref) {
     final repository = SqfliteBookRepository(ref.watch(appDatabaseProvider));
-    unawaited(repository.load());
+    var disposed = false;
+    ref.onDispose(() => disposed = true);
+    Timer.run(() {
+      if (!disposed) {
+        unawaited(repository.load());
+      }
+    });
     return repository;
   },
 );
