@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
 import '../core/utils/date_formatters.dart';
+import '../core/utils/number_formatters.dart';
 import '../domain/books/book.dart';
 import '../domain/books/book_rules.dart';
 import '../domain/books/book_status.dart';
@@ -624,7 +625,7 @@ class StatsPage extends StatelessWidget {
             childAspectRatio: 1.5,
             children: [
               _StatTile(value: '$finishedCount', label: 'Books finished', icon: Icons.check_circle_outline_rounded),
-              _StatTile(value: _formatNumber(totalPages), label: 'Pages read', icon: Icons.menu_book_rounded),
+              _StatTile(value: formatCompactNumber(totalPages), label: 'Pages read', icon: Icons.menu_book_rounded),
               _StatTile(value: average == 0 ? '—' : average.toStringAsFixed(1), label: 'Average rating', icon: Icons.star_outline_rounded),
               _StatTile(value: favoriteGenre, label: 'Favorite genre', icon: Icons.local_library_outlined, smallValue: true),
             ],
@@ -1016,11 +1017,6 @@ class _BarChart extends StatelessWidget {
     const labels = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A'];
     return Container(height: 196, padding: const EdgeInsets.fromLTRB(14, 16, 14, 12), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: Theme.of(context).dividerColor)), child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceAround, children: List.generate(values.length, (index) => Column(mainAxisAlignment: MainAxisAlignment.end, children: [Expanded(child: Align(alignment: Alignment.bottomCenter, child: Container(width: 22, height: values[index] * 25, decoration: BoxDecoration(color: index == values.length - 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.primary.withValues(alpha: .25), borderRadius: const BorderRadius.vertical(top: Radius.circular(8)))))), const SizedBox(height: 9), Text(labels[index], style: Theme.of(context).textTheme.bodySmall)]))));
   }
-}
-
-String _formatNumber(int value) {
-  if (value < 1000) return '$value';
-  return '${(value / 1000).toStringAsFixed(1)}k';
 }
 
 Future<void> _showGoalEditor(BuildContext context, int current, ValueChanged<int> onChanged) async {
