@@ -92,13 +92,13 @@ Temuan utama:
 
 ## Phase 5 - Reusable Widgets
 
-- [ ] Buat `lib/shared/widgets/section_header.dart`.
-- [ ] Buat `lib/shared/widgets/shelf_filter_chip.dart`.
-- [ ] Buat `lib/shared/widgets/no_results.dart`.
-- [ ] Buat `lib/shared/widgets/detail_section.dart`.
-- [ ] Buat `lib/shared/widgets/meta_row.dart`.
-- [ ] Pastikan semua widget memakai token theme.
-- [ ] Pastikan tooltip tersedia untuk icon button yang butuh label.
+- [x] Buat `lib/shared/widgets/section_header.dart`.
+- [x] Buat `lib/shared/widgets/shelf_filter_chip.dart`.
+- [x] Buat `lib/shared/widgets/no_results.dart`.
+- [x] Buat `lib/shared/widgets/detail_section.dart`.
+- [x] Buat `lib/shared/widgets/meta_row.dart`.
+- [x] Pastikan semua widget memakai token theme.
+- [x] Pastikan tooltip tersedia untuk icon button yang butuh label.
 
 ## Phase 6 - Feature Widgets and Screens
 

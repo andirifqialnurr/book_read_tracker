@@ -7,6 +7,11 @@ import '../core/utils/number_formatters.dart';
 import '../domain/books/book.dart';
 import '../domain/books/book_rules.dart';
 import '../domain/books/book_status.dart';
+import '../shared/widgets/detail_section.dart';
+import '../shared/widgets/meta_row.dart';
+import '../shared/widgets/no_results.dart';
+import '../shared/widgets/section_header.dart';
+import '../shared/widgets/shelf_filter_chip.dart';
 
 class ShelfShell extends StatefulWidget {
   const ShelfShell({required this.onToggleTheme, super.key});
@@ -336,7 +341,7 @@ class HomePage extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
           sliver: SliverToBoxAdapter(
-            child: _SectionHeader(title: 'Currently reading', actionLabel: 'See all', onAction: onSeeLibrary),
+            child: SectionHeader(title: 'Currently reading', actionLabel: 'See all', onAction: onSeeLibrary),
           ),
         ),
         SliverPadding(
@@ -366,7 +371,7 @@ class HomePage extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
           sliver: SliverToBoxAdapter(
-            child: _SectionHeader(title: 'Recently finished', actionLabel: 'Library', onAction: onSeeLibrary),
+            child: SectionHeader(title: 'Recently finished', actionLabel: 'Library', onAction: onSeeLibrary),
           ),
         ),
         SliverPadding(
@@ -423,8 +428,8 @@ class LibraryPage extends StatelessWidget {
                     style: AppTextStyles.editorial(context, 30),
                   ),
                 ),
-                IconButton(onPressed: onAddBook, icon: const Icon(Icons.add_rounded)),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.tune_rounded)),
+                IconButton(tooltip: 'Add book', onPressed: onAddBook, icon: const Icon(Icons.add_rounded)),
+                IconButton(tooltip: 'Filter library', onPressed: () {}, icon: const Icon(Icons.tune_rounded)),
               ],
             ),
           ),
@@ -449,8 +454,8 @@ class LibraryPage extends StatelessWidget {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _FilterChip(label: 'All books', selected: filter == null, onTap: () => onFilterChanged(null)),
-                  ...BookStatus.values.map((status) => _FilterChip(label: status.label, selected: filter == status, onTap: () => onFilterChanged(status))),
+                  ShelfFilterChip(label: 'All books', selected: filter == null, onTap: () => onFilterChanged(null)),
+                  ...BookStatus.values.map((status) => ShelfFilterChip(label: status.label, selected: filter == status, onTap: () => onFilterChanged(status))),
                 ],
               ),
             ),
@@ -459,7 +464,7 @@ class LibraryPage extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
           sliver: books.isEmpty
-              ? SliverToBoxAdapter(child: _NoResults(query: query))
+              ? SliverToBoxAdapter(child: NoResults(query: query))
               : SliverGrid(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) => _LibraryBookCard(book: books[index], onTap: () => onOpenBook(books[index])),
@@ -614,7 +619,7 @@ class StatsPage extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
-        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 0), sliver: SliverToBoxAdapter(child: Row(children: [Expanded(child: Text('Reading stats', style: AppTextStyles.editorial(context, 30))), IconButton(onPressed: () => _showGoalEditor(context, goal, onGoalChanged), icon: const Icon(Icons.edit_outlined))]))),
+        SliverPadding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 0), sliver: SliverToBoxAdapter(child: Row(children: [Expanded(child: Text('Reading stats', style: AppTextStyles.editorial(context, 30))), IconButton(tooltip: 'Edit annual goal', onPressed: () => _showGoalEditor(context, goal, onGoalChanged), icon: const Icon(Icons.edit_outlined))]))),
         SliverPadding(padding: const EdgeInsets.fromLTRB(20, 18, 20, 0), sliver: SliverToBoxAdapter(child: _GoalCard(progress: goal == 0 ? 0.0 : (finishedCount / goal).clamp(0.0, 1.0).toDouble(), count: finishedCount, goal: goal, compact: true))),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
@@ -693,7 +698,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           const SizedBox(height: 6),
           Text('How did ${_book.title} feel?', style: Theme.of(context).textTheme.bodyMedium),
           const SizedBox(height: 20),
-          ValueListenableBuilder<double>(valueListenable: rating, builder: (_, value, __) => Row(children: List.generate(5, (index) => IconButton(onPressed: () { rating.value = index + 1.0; setSheetState(() {}); }, iconSize: 31, color: index < value ? AppColors.star : Theme.of(context).dividerColor, icon: Icon(index < value ? Icons.star_rounded : Icons.star_outline_rounded))))),
+          ValueListenableBuilder<double>(valueListenable: rating, builder: (_, value, __) => Row(children: List.generate(5, (index) => IconButton(tooltip: 'Rate ${index + 1} stars', onPressed: () { rating.value = index + 1.0; setSheetState(() {}); }, iconSize: 31, color: index < value ? AppColors.star : Theme.of(context).dividerColor, icon: Icon(index < value ? Icons.star_rounded : Icons.star_outline_rounded))))),
           const SizedBox(height: 8),
           TextField(controller: reviewController, maxLines: 4, textCapitalization: TextCapitalization.sentences, decoration: const InputDecoration(labelText: 'Personal review', hintText: 'A few words for future you...')),
           const SizedBox(height: 16),
@@ -710,7 +715,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     final progress = _book.progress;
     final statusColor = _book.status.color(Theme.of(context).brightness);
     return Scaffold(
-      appBar: AppBar(leading: IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded)), actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz_rounded))]),
+      appBar: AppBar(leading: IconButton(tooltip: 'Back', onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_rounded)), actions: [IconButton(tooltip: 'More actions', onPressed: () {}, icon: const Icon(Icons.more_horiz_rounded))]),
       body: ListView(padding: const EdgeInsets.fromLTRB(20, 4, 20, 30), children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _BookCover(book: _book, width: 126, height: 188),
@@ -728,10 +733,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ],
         Row(children: [Expanded(child: OutlinedButton.icon(onPressed: _showProgress, icon: const Icon(Icons.edit_note_rounded), label: const Text('Update progress'))), const SizedBox(width: 10), Expanded(child: FilledButton.icon(onPressed: _book.status == BookStatus.finished ? _finishBook : _finishBook, icon: const Icon(Icons.check_rounded), label: Text(_book.status == BookStatus.finished ? 'Edit review' : 'Finish book')))]),
         const SizedBox(height: 30),
-        _DetailSection(title: 'About this reading', child: Column(children: [if (_book.startedAt != null) _MetaRow(label: 'Started', value: formatShelfDate(_book.startedAt!)), if (_book.finishedAt != null) _MetaRow(label: 'Finished', value: formatShelfDate(_book.finishedAt!)), _MetaRow(label: 'Shelf', value: _book.status.label)])),
+        DetailSection(title: 'About this reading', child: Column(children: [if (_book.startedAt != null) MetaRow(label: 'Started', value: formatShelfDate(_book.startedAt!)), if (_book.finishedAt != null) MetaRow(label: 'Finished', value: formatShelfDate(_book.finishedAt!)), MetaRow(label: 'Shelf', value: _book.status.label)])),
         if (_book.rating != null || _book.review != null) ...[
           const SizedBox(height: 26),
-          _DetailSection(title: 'Your review', child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (_book.rating != null) Row(children: [const Icon(Icons.star_rounded, color: AppColors.star), const SizedBox(width: 5), Text('${_book.rating!.toStringAsFixed(1)} / 5', style: const TextStyle(fontWeight: FontWeight.w800))]), if (_book.review != null) ...[const SizedBox(height: 14), Text(_book.review!, style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.55))]])),
+          DetailSection(title: 'Your review', child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if (_book.rating != null) Row(children: [const Icon(Icons.star_rounded, color: AppColors.star), const SizedBox(width: 5), Text('${_book.rating!.toStringAsFixed(1)} / 5', style: const TextStyle(fontWeight: FontWeight.w800))]), if (_book.review != null) ...[const SizedBox(height: 14), Text(_book.review!, style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.55))]])),
         ],
       ]),
     );
@@ -917,84 +922,12 @@ class _GoalCard extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, required this.actionLabel, required this.onAction});
-  final String title;
-  final String actionLabel;
-  final VoidCallback onAction;
-
-  @override
-  Widget build(BuildContext context) => Row(children: [Expanded(child: Text(title, style: AppTextStyles.editorial(context, 21))), TextButton(onPressed: onAction, child: Text(actionLabel))]);
-}
-
 class _EmptyReadingCard extends StatelessWidget {
   const _EmptyReadingCard({required this.onAdd});
   final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: Theme.of(context).dividerColor)), child: Row(children: [Icon(Icons.auto_stories_outlined, size: 34, color: Theme.of(context).colorScheme.primary), const SizedBox(width: 14), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('Nothing on your nightstand yet', style: TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 4), Text('Add a book to start your next chapter.', style: Theme.of(context).textTheme.bodySmall)])), TextButton(onPressed: onAdd, child: const Text('Add'))]));
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, required this.selected, required this.onTap});
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(right: 8), child: ChoiceChip(label: Text(label), selected: selected, onSelected: (_) => onTap()));
-}
-
-class _NoResults extends StatelessWidget {
-  const _NoResults({required this.query});
-  final String query;
-
-  @override
-  Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 65),
-          child: Column(
-            children: [
-              Icon(
-                Icons.search_off_rounded,
-                size: 42,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 14),
-              Text(
-                'No books found',
-                style: AppTextStyles.editorial(context, 21),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                query.isEmpty
-                    ? 'Try a different filter.'
-                    : 'Nothing matched "$query".',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-      );
-}
-
-class _DetailSection extends StatelessWidget {
-  const _DetailSection({required this.title, required this.child});
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: AppTextStyles.editorial(context, 20)), const SizedBox(height: 12), Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(18), border: Border.all(color: Theme.of(context).dividerColor)), child: child)]);
-}
-
-class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.label, required this.value});
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.symmetric(vertical: 5), child: Row(children: [Expanded(child: Text(label, style: Theme.of(context).textTheme.bodySmall)), Text(value, style: const TextStyle(fontWeight: FontWeight.w700))]));
 }
 
 class _StatTile extends StatelessWidget {
