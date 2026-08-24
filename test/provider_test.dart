@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shelf_book_tracker/domain/books/book.dart';
 import 'package:shelf_book_tracker/domain/books/book_status.dart';
 import 'package:shelf_book_tracker/features/books/book_providers.dart';
+import 'package:shelf_book_tracker/features/goals/goal_providers.dart';
 import 'package:shelf_book_tracker/features/library/library_filter.dart';
 import 'package:shelf_book_tracker/features/library/library_providers.dart';
 import 'package:shelf_book_tracker/features/stats/stats_providers.dart';
@@ -117,5 +118,41 @@ void main() {
 
     repository.deleteBook(99);
     expect(container.read(bookByIdProvider(99)), isNull);
+  });
+
+  test('home and goal providers expose derived reading state', () {
+    final container = ProviderContainer(
+      overrides: [
+        bookRepositoryProvider.overrideWith(
+          (ref) => InMemoryBookRepository(initialBooks: const []),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final repository = container.read(bookRepositoryProvider.notifier);
+    repository
+      ..addBook(
+        Book(
+          id: 1,
+          title: 'Reading',
+          author: 'Reader',
+          status: BookStatus.reading,
+        ),
+      )
+      ..addBook(
+        Book(
+          id: 2,
+          title: 'Finished',
+          author: 'Reader',
+          status: BookStatus.finished,
+        ),
+      );
+
+    expect(container.read(currentlyReadingProvider).single.title, 'Reading');
+    expect(container.read(recentlyFinishedProvider).single.title, 'Finished');
+
+    container.read(activeReadingGoalProvider.notifier).setGoal(36);
+    expect(container.read(activeReadingGoalProvider), 36);
   });
 }

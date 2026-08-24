@@ -149,16 +149,16 @@ Temuan utama:
 - [x] Buat `bookByIdProvider`.
 - [x] Buat `libraryFilterProvider`.
 - [x] Buat `filteredBooksProvider`.
-- [ ] Buat `currentlyReadingProvider`.
-- [ ] Buat `recentlyFinishedProvider`.
-- [ ] Buat `activeReadingGoalProvider`.
+- [x] Buat `currentlyReadingProvider`.
+- [x] Buat `recentlyFinishedProvider`.
+- [x] Buat `activeReadingGoalProvider`.
 - [ ] Buat `readingStatsProvider`.
 - [ ] Buat `themeModeProvider`.
 - [ ] Buat controller/notifier:
   - [ ] `BookFormController`
   - [ ] `BookDetailController`
   - [ ] `LibraryFilterController`
-  - [ ] `ReadingGoalController`
+  - [x] `ReadingGoalController`
   - [ ] `ThemeController`
 
 ## Phase 8 - sqflite Persistence

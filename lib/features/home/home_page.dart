@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_text_styles.dart';
 import '../../domain/books/book.dart';
-import '../../domain/books/book_status.dart';
 import '../../shared/widgets/section_header.dart';
 import '../goals/widgets/goal_card.dart';
 import 'widgets/finished_book_row.dart';
@@ -10,7 +9,8 @@ import 'widgets/reading_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
-    required this.books,
+    required this.currentlyReading,
+    required this.recentlyFinished,
     required this.goal,
     required this.finishedCount,
     required this.onOpenBook,
@@ -20,7 +20,8 @@ class HomePage extends StatelessWidget {
     super.key,
   });
 
-  final List<Book> books;
+  final List<Book> currentlyReading;
+  final List<Book> recentlyFinished;
   final int goal;
   final int finishedCount;
   final ValueChanged<Book> onOpenBook;
@@ -30,8 +31,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reading = books.where((book) => book.status == BookStatus.reading).toList();
-    final finished = books.where((book) => book.status == BookStatus.finished).toList();
     final progress = goal == 0
         ? 0.0
         : (finishedCount / goal).clamp(0.0, 1.0).toDouble();
@@ -97,7 +96,7 @@ class HomePage extends StatelessWidget {
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 14, 0, 0),
-          sliver: reading.isEmpty
+          sliver: currentlyReading.isEmpty
               ? SliverToBoxAdapter(child: _EmptyReadingCard(onAdd: onSeeLibrary))
               : SliverToBoxAdapter(
                   child: SizedBox(
@@ -105,10 +104,10 @@ class HomePage extends StatelessWidget {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.only(right: 20),
-                      itemCount: reading.length,
+                      itemCount: currentlyReading.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 14),
                       itemBuilder: (context, index) {
-                        final book = reading[index];
+                        final book = currentlyReading[index];
                         return ReadingCard(
                           book: book,
                           onTap: () => onOpenBook(book),
@@ -141,7 +140,7 @@ class HomePage extends StatelessWidget {
         ),
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
-          sliver: finished.isEmpty
+          sliver: recentlyFinished.isEmpty
               ? SliverToBoxAdapter(
                   child: Text(
                     'Your finished books will appear here.',
@@ -153,11 +152,11 @@ class HomePage extends StatelessWidget {
                     (context, index) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: FinishedBookRow(
-                        book: finished[index],
-                        onTap: () => onOpenBook(finished[index]),
+                        book: recentlyFinished[index],
+                        onTap: () => onOpenBook(recentlyFinished[index]),
                       ),
                     ),
-                    childCount: finished.length,
+                    childCount: recentlyFinished.length,
                   ),
                 ),
         ),

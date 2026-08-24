@@ -42,6 +42,16 @@ final bookByIdProvider = Provider.family<Book?, int>((ref, id) {
   return null;
 });
 
+final currentlyReadingProvider = Provider<List<Book>>((ref) {
+  final books = ref.watch(booksProvider);
+  return books.where((book) => book.status == BookStatus.reading).toList();
+});
+
+final recentlyFinishedProvider = Provider<List<Book>>((ref) {
+  final books = ref.watch(booksProvider);
+  return books.where((book) => book.status == BookStatus.finished).toList();
+});
+
 final _seedBooks = [
   Book(
     id: 1,

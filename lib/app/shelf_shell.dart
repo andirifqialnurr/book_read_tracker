@@ -8,6 +8,7 @@ import '../domain/books/book_status.dart';
 import '../features/books/book_detail_page.dart';
 import '../features/books/book_form_page.dart';
 import '../features/books/book_providers.dart';
+import '../features/goals/goal_providers.dart';
 import '../features/home/home_page.dart';
 import '../features/library/library_providers.dart';
 import '../features/library/library_page.dart';
@@ -24,7 +25,6 @@ class ShelfShell extends ConsumerStatefulWidget {
 
 class _ShelfShellState extends ConsumerState<ShelfShell> {
   int _selectedIndex = 0;
-  int _goal = 24;
   int _finishedThisYear(List<Book> books) => books.where((book) {
         return book.status == BookStatus.finished &&
             book.finishedAt?.year == DateTime.now().year;
@@ -124,6 +124,9 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
   @override
   Widget build(BuildContext context) {
     final books = ref.watch(booksProvider);
+    final currentlyReading = ref.watch(currentlyReadingProvider);
+    final recentlyFinished = ref.watch(recentlyFinishedProvider);
+    final goal = ref.watch(activeReadingGoalProvider);
     final libraryFilter = ref.watch(libraryFilterProvider);
     final filteredBooks = ref.watch(filteredBooksProvider);
     final finishedThisYear = _finishedThisYear(books);
@@ -135,8 +138,9 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
           index: _selectedIndex,
           children: [
             HomePage(
-              books: books,
-              goal: _goal,
+              currentlyReading: currentlyReading,
+              recentlyFinished: recentlyFinished,
+              goal: goal,
               finishedCount: finishedThisYear,
               onOpenBook: _openBook,
               onUpdateProgress: _showProgressSheet,
@@ -165,10 +169,10 @@ class _ShelfShellState extends ConsumerState<ShelfShell> {
             ),
             StatsPage(
               books: books,
-              goal: _goal,
+              goal: goal,
               finishedCount: finishedThisYear,
               totalPages: pages,
-              onGoalChanged: (goal) => setState(() => _goal = goal),
+              onGoalChanged: ref.read(activeReadingGoalProvider.notifier).setGoal,
             ),
           ],
         ),
